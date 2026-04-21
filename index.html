@@ -102,15 +102,21 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
 <div id="screen-pair" class="screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:24px">
   <div style="background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 2px 16px rgba(0,0,0,0.08)">
     <div style="font-size:18px;font-weight:700;margin-bottom:4px">ペアを設定する</div>
-    <div style="font-size:13px;color:#888;margin-bottom:20px">相手と2人でペアを作って送迎を記録します</div>
+    <div style="font-size:13px;color:#888;margin-bottom:20px">家族単位で送迎費用を記録・折半します</div>
 
     <div style="margin-bottom:20px">
       <div class="sec-title">新しいペアを作る</div>
-      <div class="label">表示名（例：髙井家）</div>
+      <div class="label">あなたの家族名</div>
+      <select id="pair-family" style="margin-bottom:10px">
+        <option value="髙井家">髙井家</option>
+        <option value="宮城家">宮城家</option>
+        <option value="新垣家">新垣家</option>
+      </select>
+      <div class="label">表示名（例：髙井家パパ）</div>
       <input type="text" id="pair-myname" placeholder="あなたの表示名" style="margin-bottom:10px">
-      <div class="label">ペア名（例：さくらチーム送迎）</div>
-      <input type="text" id="pair-name" placeholder="ペアの名前" style="margin-bottom:10px">
-      <button class="primary" onclick="createPair()">ペアを作成して招待コードを発行</button>
+      <div class="label">グループ名（例：さくらチーム送迎）</div>
+      <input type="text" id="pair-name" placeholder="グループの名前" style="margin-bottom:10px">
+      <button class="primary" onclick="createPair()">グループを作成して招待コードを発行</button>
     </div>
 
     <div style="display:flex;align-items:center;gap:8px;margin:16px 0">
@@ -121,7 +127,13 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
 
     <div>
       <div class="sec-title">招待コードで参加する</div>
-      <div class="label">表示名（例：宮城家）</div>
+      <div class="label">あなたの家族名</div>
+      <select id="join-family" style="margin-bottom:10px">
+        <option value="髙井家">髙井家</option>
+        <option value="宮城家">宮城家</option>
+        <option value="新垣家">新垣家</option>
+      </select>
+      <div class="label">表示名（例：宮城家パパ）</div>
       <input type="text" id="join-myname" placeholder="あなたの表示名" style="margin-bottom:10px">
       <div class="label">招待コード（6桁）</div>
       <input type="text" id="join-code" placeholder="123456" maxlength="6" style="margin-bottom:10px;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px">
@@ -542,7 +554,8 @@ function generateCode() {
 async function createPair() {
   const myname = document.getElementById('pair-myname').value.trim();
   const pairname = document.getElementById('pair-name').value.trim();
-  if (!myname || !pairname) { showToast('表示名とペア名を入力してください'); return; }
+  const familyName = document.getElementById('pair-family').value;
+  if (!myname || !pairname) { showToast('表示名とグループ名を入力してください'); return; }
 
   const code = generateCode();
   const { data: pair, error: pe } = await sb.from('pairs')
@@ -551,7 +564,7 @@ async function createPair() {
   if (pe) { showToast('エラー: ' + pe.message); return; }
 
   const { error: me } = await sb.from('pair_members')
-    .insert({ pair_id: pair.id, user_id: currentUser.id, display_name: myname });
+    .insert({ pair_id: pair.id, user_id: currentUser.id, display_name: myname, family_name: familyName });
   if (me) { showToast('エラー: ' + me.message); return; }
 
   currentPair = pair;
@@ -565,6 +578,7 @@ async function createPair() {
 async function joinPair() {
   const myname = document.getElementById('join-myname').value.trim();
   const code = document.getElementById('join-code').value.trim();
+  const familyName = document.getElementById('join-family').value;
   if (!myname || !code) { showToast('表示名と招待コードを入力してください'); return; }
 
   const { data: pairs, error: pe } = await sb.from('pairs').select('*').eq('invite_code', code);
@@ -572,7 +586,7 @@ async function joinPair() {
 
   const pair = pairs[0];
   const { error: me } = await sb.from('pair_members')
-    .insert({ pair_id: pair.id, user_id: currentUser.id, display_name: myname });
+    .insert({ pair_id: pair.id, user_id: currentUser.id, display_name: myname, family_name: familyName });
   if (me) { showToast('エラー: ' + me.message); return; }
 
   currentPair = pair;
@@ -797,52 +811,56 @@ async function renderSummary() {
   const all = await loadEntries();
   const entries = getFiltered(all, currentPeriod);
   const members = await loadMembers();
-  const nameMap = {};
-  members.forEach(m => { nameMap[m.user_id] = m.display_name; });
 
-  // 各メンバーが「支払うべき額」と「受け取るべき額」を計算
+  // user_id → family_name のマップ
+  const familyMap = {};
+  members.forEach(m => { familyMap[m.user_id] = m.family_name || m.display_name; });
+
+  // 家族ごとの収支（family_name単位で集計）
+  const families = [...new Set(members.map(m => m.family_name || m.display_name))];
   const balance = {};
-  members.forEach(m => { balance[m.user_id] = 0; });
+  families.forEach(f => { balance[f] = 0; });
+  // 旧データ用に固定家族も追加
+  if (!balance['髙井家']) balance['髙井家'] = 0;
+  if (!balance['宮城家']) balance['宮城家'] = 0;
 
   entries.forEach(e => {
     const total = entryTotal(e, s);
     const dId = e.driver_id || e.user_id;
-    let pIds;
+
     if (Array.isArray(e.passengers) && e.passengers.length > 0) {
-      pIds = e.passengers;
-      if (pIds.length === 0) return;
-      const splitCount = pIds.length + 1;
+      const dFamily = familyMap[dId] || '不明';
+      const pFamilies = [...new Set(e.passengers.map(pid => familyMap[pid]).filter(Boolean))];
+      if (pFamilies.length === 0) return;
+      const splitCount = pFamilies.length + 1;
       const perFamily = total / splitCount;
-      pIds.forEach(pid => {
-        if (balance[pid] !== undefined) balance[pid] -= perFamily;
-        if (balance[dId] !== undefined) balance[dId] += perFamily;
+      pFamilies.forEach(pf => {
+        if (balance[pf] !== undefined) balance[pf] -= perFamily;
+        if (balance[dFamily] !== undefined) balance[dFamily] += perFamily;
       });
     } else {
       // 旧データ：send=髙井家ドライバー、recv=宮城家ドライバー
-      // メンバーから髙井家・宮城家のuser_idを特定
-      const takaiMember = members.find(m => m.display_name === '髙井家');
-      const miyagiMember = members.find(m => m.display_name === '宮城家');
-      if (!takaiMember || !miyagiMember) return;
-      const driverId = e.dir === 'send' ? takaiMember.user_id : miyagiMember.user_id;
-      const passengerId = e.dir === 'send' ? miyagiMember.user_id : takaiMember.user_id;
+      const dFamily = e.dir === 'send' ? '髙井家' : '宮城家';
+      const pFamily = e.dir === 'send' ? '宮城家' : '髙井家';
       const perFamily = total / 2;
-      if (balance[passengerId] !== undefined) balance[passengerId] -= perFamily;
-      if (balance[driverId] !== undefined) balance[driverId] += perFamily;
+      if (balance[pFamily] !== undefined) balance[pFamily] -= perFamily;
+      if (balance[dFamily] !== undefined) balance[dFamily] += perFamily;
     }
   });
 
-  // メトリクス表示（各メンバーの収支）
-  const metricsHtml = members.map(m => {
-    const val = balance[m.user_id] || 0;
+  // メトリクス表示（家族単位）
+  const displayFamilies = Object.keys(balance).filter(f => balance[f] !== 0 || families.includes(f));
+  const metricsHtml = displayFamilies.map(f => {
+    const val = balance[f] || 0;
     const color = val > 0 ? '#2e7d32' : val < 0 ? '#c62828' : '#1a1a1a';
     const label = val > 0 ? '受取' : val < 0 ? '支払' : '±0';
     return `<div class="metric">
-      <div class="mlabel">${m.display_name}</div>
+      <div class="mlabel">${f}</div>
       <div class="val" style="font-size:15px;color:${color}">${val >= 0 ? '+' : ''}${fmt(val)}</div>
       <div style="font-size:10px;color:#aaa;margin-top:2px">${label}</div>
     </div>`;
   }).join('');
-  document.getElementById('summary-metrics').innerHTML = metricsHtml;
+  document.getElementById('summary-metrics').innerHTML = metricsHtml || '<div style="grid-column:1/-1;text-align:center;padding:12px;color:#aaa;font-size:13px">データがありません</div>';
 
   let detail = `<div class="sec-title">内訳（${entries.length}件）</div>`;
   if (!entries.length) {
@@ -858,20 +876,13 @@ async function renderSummary() {
     </div>`;
 
     // 支払い案内
-    const payments = [];
-    members.forEach(from => {
-      if ((balance[from.user_id] || 0) < -1) {
-        // この人が支払うべき相手を探す（最もプラスの人）
-        const receiver = members.filter(m => (balance[m.user_id] || 0) > 1)
-          .sort((a, b) => (balance[b.user_id] || 0) - (balance[a.user_id] || 0))[0];
-        if (receiver) {
-          payments.push(`${from.display_name} → ${receiver.display_name}へ ${fmt(Math.abs(balance[from.user_id]))} お支払い`);
-        }
-      }
-    });
-    if (payments.length > 0) {
-      payments.forEach(p => {
-        detail += `<div class="alert-pay" style="margin-top:8px">${p}</div>`;
+    const payers = displayFamilies.filter(f => (balance[f] || 0) < -1);
+    const receivers = displayFamilies.filter(f => (balance[f] || 0) > 1).sort((a, b) => (balance[b] || 0) - (balance[a] || 0));
+    if (payers.length > 0 && receivers.length > 0) {
+      payers.forEach(payer => {
+        receivers.forEach(receiver => {
+          detail += `<div class="alert-pay" style="margin-top:8px">${payer} → ${receiver}へ ${fmt(Math.abs(balance[payer]))} お支払い</div>`;
+        });
       });
     } else {
       detail += `<div class="hint" style="margin-top:8px">ちょうど釣り合っています</div>`;
