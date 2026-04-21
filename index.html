@@ -98,14 +98,14 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
   </div>
 </div>
 
-<!-- ペア設定画面 -->
+<!-- グループ設定画面 -->
 <div id="screen-pair" class="screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:24px">
   <div style="background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 2px 16px rgba(0,0,0,0.08)">
-    <div style="font-size:18px;font-weight:700;margin-bottom:4px">ペアを設定する</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px">グループを設定する</div>
     <div style="font-size:13px;color:#888;margin-bottom:20px">家族単位で送迎費用を記録・折半します</div>
 
     <div style="margin-bottom:20px">
-      <div class="sec-title">新しいペアを作る</div>
+      <div class="sec-title">新しいグループを作る</div>
       <div class="label">あなたの家族名</div>
       <select id="pair-family" style="margin-bottom:10px">
         <option value="髙井家">髙井家</option>
@@ -149,7 +149,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
 <!-- 招待コード表示画面 -->
 <div id="screen-invite" class="screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:24px">
   <div style="background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 2px 16px rgba(0,0,0,0.08);text-align:center">
-    <div style="font-size:18px;font-weight:700;margin-bottom:8px">ペアを作成しました！</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px">グループを作成しました！</div>
     <div style="font-size:13px;color:#888;margin-bottom:16px">この招待コードを相手に伝えてください</div>
     <div class="invite-code" id="invite-code-display">------</div>
     <div style="font-size:12px;color:#aaa;margin-bottom:20px">相手がこのコードを入力すると参加できます</div>
@@ -331,11 +331,11 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
     <!-- 設定タブ -->
     <div id="tab-settings" style="display:none">
       <div class="card">
-        <div class="sec-title">ペア情報</div>
+        <div class="sec-title">グループ情報</div>
         <div id="pair-info"></div>
         <div style="margin-top:12px;display:flex;gap:8px">
           <button class="secondary" onclick="showInviteCode()" style="flex:1">招待コードを確認</button>
-          <button class="danger-sm" onclick="leavePair()" style="flex:1;height:40px">ペアから抜ける</button>
+          <button class="danger-sm" onclick="leavePair()" style="flex:1;height:40px">グループから抜ける</button>
         </div>
       </div>
       <div class="card">
@@ -344,7 +344,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         <input type="text" id="new-display-name" placeholder="例：髙井家パパ" style="margin-bottom:10px">
         <button class="secondary" onclick="updateDisplayName()" style="width:100%">変更する</button>
       </div>
-      <div class="card" id="pair-name-card" style="display:none">
+      <div class="card" id="group-name-card" style="display:none">
         <div class="sec-title">グループ名を変更</div>
         <div class="label" style="margin-bottom:4px">新しいグループ名</div>
         <input type="text" id="new-pair-name" placeholder="例：さくらチーム送迎" style="margin-bottom:10px">
@@ -384,7 +384,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
           </div>
         </div>
         <div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#555;line-height:1.7;border:1px solid #f0f0f0">
-          送迎費用を2家庭間で記録・折半するアプリです。メールアドレスで登録して、招待コードで相手とペアを組んで使います。
+          送迎費用を2家庭間で記録・折半するアプリです。メールアドレスで登録して、招待コードでグループに参加して使います。
         </div>
 
         <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
@@ -396,7 +396,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">2</div>
-              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">ペアを作成する</div><div style="font-size:12px;color:#999">「新しいペアを作る」で表示名（例：髙井家）とペア名を入力して作成。6桁の招待コードが発行されます</div></div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">グループを作成する</div><div style="font-size:12px;color:#999">「新しいグループを作る」で表示名（例：髙井家）とグループ名を入力して作成。6桁の招待コードが発行されます</div></div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">3</div>
@@ -404,7 +404,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">4</div>
-              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">準備完了！記録を始める</div><div style="font-size:12px;color:#999">ペアが成立したら送迎の記録ができます。複数人が同じ招待コードで参加もOKです</div></div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">準備完了！記録を始める</div><div style="font-size:12px;color:#999">グループが作成されたら送迎の記録ができます。複数人が同じ招待コードで参加もOKです</div></div>
             </div>
           </div>
         </div>
@@ -447,7 +447,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
             </div>
             <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
               <div style="font-size:12px;font-weight:700;margin-bottom:3px">招待コードを忘れた</div>
-              <div style="font-size:11px;color:#999">「設定」タブの「ペア情報」から確認できます。</div>
+              <div style="font-size:11px;color:#999">「設定」タブの「グループ情報」から確認できます。</div>
             </div>
             <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
               <div style="font-size:12px;font-weight:700;margin-bottom:3px">誤って記録した</div>
@@ -650,7 +650,7 @@ function enterMain() {
   // 管理者タブ・グループ名変更カード表示
   if (currentUser?.email === ADMIN_EMAIL) {
     document.getElementById('tab-admin-btn').style.display = 'flex';
-    document.getElementById('pair-name-card').style.display = 'block';
+    document.getElementById('group-name-card').style.display = 'block';
   }
   showScreen('main');
 }
@@ -712,7 +712,7 @@ function renderPairInfo() {
   const el = document.getElementById('pair-info');
   if (!currentPair || !myMember) return;
   el.innerHTML = `
-    <div class="setting-row"><span>ペア名</span><span style="font-weight:600">${currentPair.name}</span></div>
+    <div class="setting-row"><span>グループ名</span><span style="font-weight:600">${currentPair.name}</span></div>
     <div class="setting-row"><span>あなたの表示名</span><span style="font-weight:600">${myMember.display_name}</span></div>
     <div class="setting-row"><span>招待コード</span><span style="font-weight:600;letter-spacing:3px">${currentPair.invite_code}</span></div>
   `;
@@ -738,7 +738,7 @@ async function updateDisplayName() {
 }
 
 async function leavePair() {
-  if (!confirm('ペアから抜けますか？記録は残ります。')) return;
+  if (!confirm('グループから抜けますか？記録は残ります。')) return;
   await sb.from('pair_members').delete().eq('user_id', currentUser.id).eq('pair_id', currentPair.id);
   currentPair = null; myMember = null;
   showScreen('pair');
@@ -797,7 +797,7 @@ function updatePreview() {
 }
 
 async function addEntry() {
-  if (!currentPair) { showToast('ペアが設定されていません'); return; }
+  if (!currentPair) { showToast('グループが設定されていません'); return; }
   const date = document.getElementById('inp-date').value;
   if (!date) { showToast('日付を入力してください'); return; }
   const driverId = document.getElementById('inp-driver').value;
