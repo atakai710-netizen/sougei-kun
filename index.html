@@ -338,6 +338,12 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         </div>
       </div>
       <div class="card">
+        <div class="sec-title">表示名を変更</div>
+        <div class="label" style="margin-bottom:4px">新しい表示名</div>
+        <input type="text" id="new-display-name" placeholder="例：髙井家パパ" style="margin-bottom:10px">
+        <button class="secondary" onclick="updateDisplayName()" style="width:100%">変更する</button>
+      </div>
+      <div class="card">
         <div class="sec-title">計算設定</div>
         <div class="setting-row">
           <span>ガソリン単価（円/L）</span>
@@ -654,6 +660,21 @@ function renderPairInfo() {
 
 async function showInviteCode() {
   showToast('招待コード: ' + currentPair.invite_code);
+}
+
+async function updateDisplayName() {
+  const newName = document.getElementById('new-display-name').value.trim();
+  if (!newName) { showToast('新しい表示名を入力してください'); return; }
+  const { error } = await sb.from('pair_members')
+    .update({ display_name: newName })
+    .eq('user_id', currentUser.id)
+    .eq('pair_id', currentPair.id);
+  if (error) { showToast('エラー: ' + error.message); return; }
+  myMember.display_name = newName;
+  document.getElementById('user-badge-label').textContent = newName + ' 設定';
+  document.getElementById('new-display-name').value = '';
+  renderPairInfo();
+  showToast('表示名を変更しました！');
 }
 
 async function leavePair() {
