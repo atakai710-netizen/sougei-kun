@@ -658,11 +658,23 @@ function enterMain() {
 function renderDriverSelect(members) {
   const sel = document.getElementById('inp-driver');
   sel.innerHTML = '<option value="">— 選択 —</option>';
+  // 家族名でまとめて重複排除
+  const families = [];
+  const seen = new Set();
   members.forEach(m => {
+    const fname = m.family_name || m.display_name;
+    if (!seen.has(fname)) {
+      seen.add(fname);
+      families.push({ user_id: m.user_id, family_name: fname });
+    }
+  });
+  families.forEach(f => {
     const opt = document.createElement('option');
-    opt.value = m.user_id;
-    opt.textContent = m.display_name;
-    if (m.user_id === currentUser.id) opt.selected = true;
+    opt.value = f.user_id;
+    opt.textContent = f.family_name;
+    // 自分の家族名が一致したらデフォルト選択
+    const myFamily = myMember?.family_name || myMember?.display_name;
+    if (f.family_name === myFamily) opt.selected = true;
     sel.appendChild(opt);
   });
   updatePassengerList();
@@ -674,12 +686,23 @@ function updatePassengerList() {
 
 function renderPassengerList(members) {
   const driverId = document.getElementById('inp-driver').value;
+  const driverMember = members.find(m => m.user_id === driverId);
+  const driverFamily = driverMember ? (driverMember.family_name || driverMember.display_name) : null;
   const container = document.getElementById('passenger-list');
-  const passengers = members.filter(m => m.user_id !== driverId);
-  container.innerHTML = passengers.map(m => `
+  // 家族名でまとめて重複排除（ドライバーの家族は除外）
+  const families = [];
+  const seen = new Set();
+  members.forEach(m => {
+    const fname = m.family_name || m.display_name;
+    if (!seen.has(fname) && fname !== driverFamily) {
+      seen.add(fname);
+      families.push({ user_id: m.user_id, family_name: fname });
+    }
+  });
+  container.innerHTML = families.map(f => `
     <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fafafa;border-radius:10px;border:1.5px solid #ececec;cursor:pointer">
-      <input type="checkbox" name="passenger" value="${m.user_id}" style="width:18px;height:18px;accent-color:#1a1a1a;cursor:pointer">
-      <span style="font-size:13px;font-weight:500">${m.display_name}</span>
+      <input type="checkbox" name="passenger" value="${f.user_id}" style="width:18px;height:18px;accent-color:#1a1a1a;cursor:pointer">
+      <span style="font-size:13px;font-weight:500">${f.family_name}</span>
     </label>
   `).join('');
   updatePreview();
