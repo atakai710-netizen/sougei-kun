@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="送迎くん">
+<title>送迎くん</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;font-size:14px;background:#f5f6f8;color:#1a1a1a;min-height:100vh}
+.header{background:#fff;border-bottom:1px solid #f0f0f0;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.header-logo{display:flex;align-items:center;gap:8px}
+.header-icon{width:30px;height:30px;background:#1a1a1a;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.header-title{font-size:16px;font-weight:800;color:#1a1a1a;letter-spacing:0.5px}
+.user-badge{font-size:12px;color:#666;background:#f5f5f5;padding:5px 12px;border-radius:999px;cursor:pointer;border:1px solid #e8e8e8;font-weight:500}
+.container{max-width:480px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid #f0f0f0}
+.sec-title{font-size:14px;font-weight:700;margin-bottom:12px;color:#1a1a1a}
+.label{font-size:11px;color:#999;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.3px}
+.field{display:flex;flex-direction:column;flex:1;min-width:80px}
+.row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}
+select,input[type=text],input[type=number],input[type=date]{height:42px;border-radius:10px;border:1.5px solid #ececec;background:#fafafa;color:#1a1a1a;padding:0 12px;font-size:13px;width:100%;-webkit-appearance:none;appearance:none;transition:border-color .15s}
+select:focus,input:focus{border-color:#1a1a1a;outline:none;background:#fff}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+button.primary{height:46px;background:#1a1a1a;color:#fff;border:none;border-radius:12px;padding:0 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;width:100%;letter-spacing:0.3px;transition:background .15s}
+button.primary:active{background:#333}
+button.secondary{height:42px;background:#fff;color:#444;border:1.5px solid #e8e8e8;border-radius:10px;padding:0 14px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:500}
+button.small{height:32px;background:#fff;color:#666;border:1px solid #e8e8e8;border-radius:8px;padding:0 12px;font-size:12px;cursor:pointer}
+button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffcdd2;border-radius:6px;padding:0 10px;font-size:12px;cursor:pointer}
+.maps-box{background:#f0f4ff;border-radius:10px;padding:12px;margin:10px 0;border:1px solid #e0e8ff}
+.maps-box a{display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;color:#fff;padding:8px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600}
+.maps-hint{font-size:12px;color:#666;margin-top:8px}
+.tabs{display:flex;background:#fff;border-bottom:1px solid #f0f0f0;position:sticky;top:55px;z-index:9}
+.tab{flex:1;padding:13px 4px;text-align:center;font-size:11px;color:#bbb;cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;font-weight:600;letter-spacing:0.3px;transition:color .15s}
+.tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.metric{background:#fafafa;border-radius:12px;padding:12px 10px;border:1px solid #f0f0f0}
+.metric .mlabel{font-size:10px;color:#aaa;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.metric .val{font-size:17px;font-weight:800;color:#1a1a1a}
+.badge{font-size:10px;padding:3px 8px;border-radius:6px;white-space:nowrap;font-weight:700;letter-spacing:0.2px}
+.badge-send{background:#e8f5e9;color:#2e7d32}
+.badge-recv{background:#fff3e0;color:#e65100}
+.log-entry{display:flex;align-items:flex-start;gap:8px;padding:12px 0;border-bottom:1px solid #f8f8f8}
+.log-entry:last-child{border-bottom:none}
+.log-meta{flex:1;min-width:0}
+.log-amount{font-weight:800;font-size:13px;min-width:58px;text-align:right;margin-top:2px}
+.hint{font-size:12px;color:#ccc;margin-top:6px}
+.preview{font-size:12px;color:#999;margin-bottom:8px;min-height:18px;font-weight:500}
+.empty{color:#ddd;text-align:center;padding:32px 0;font-size:13px}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid #eee;border-top-color:#1a1a1a;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:999px;font-size:13px;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f8f8f8;gap:8px}
+.setting-row:last-child{border-bottom:none}
+.alert-pay{background:#fff5f5;border-radius:10px;padding:12px 14px;font-size:13px;color:#c62828;margin-top:10px;font-weight:600;border-left:3px solid #ef5350}
+.alert-ok{background:#f1f8e9;border-radius:10px;padding:12px 14px;font-size:13px;color:#2e7d32;margin-top:10px;font-weight:600;border-left:3px solid #66bb6a}
+.period-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.invite-code{font-size:32px;font-weight:800;letter-spacing:8px;text-align:center;padding:20px;background:#fafafa;border-radius:14px;margin:12px 0;color:#1a1a1a;border:2px dashed #e8e8e8}
+.screen{display:none}
+.screen.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="screen-login" class="screen active" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:#f5f6f8">
+  <div style="width:100%;max-width:360px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="width:80px;height:80px;background:#1a1a1a;border-radius:22px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <path d="M6 26 L10 16 Q12 12 16 12 L24 12 Q28 12 30 16 L34 26" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          <rect x="4" y="24" width="32" height="10" rx="4" fill="#fff"/>
+          <circle cx="12" cy="34" r="3.5" fill="#1a1a1a" stroke="#fff" stroke-width="2"/>
+          <circle cx="28" cy="34" r="3.5" fill="#1a1a1a" stroke="#fff" stroke-width="2"/>
+          <rect x="16" y="15" width="8" height="6" rx="1.5" fill="#1a1a1a"/>
+        </svg>
+      </div>
+      <div style="font-size:28px;font-weight:900;color:#1a1a1a;letter-spacing:1px;margin-bottom:6px">送迎くん</div>
+      <div style="font-size:13px;color:#aaa;font-weight:500">送迎費用をスマートに折半</div>
+    </div>
+
+    <div style="background:#fff;border-radius:20px;padding:28px 24px;border:1px solid #f0f0f0">
+      <div id="login-form">
+        <div style="font-size:11px;color:#999;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.3px">メールアドレス</div>
+        <input type="email" id="auth-email" placeholder="example@gmail.com" style="margin-bottom:12px;height:42px;border-radius:10px;border:1.5px solid #ececec;background:#fafafa;width:100%;padding:0 12px;font-size:13px;-webkit-appearance:none">
+        <div style="font-size:11px;color:#999;margin-bottom:4px;font-weight:500;text-transform:uppercase;letter-spacing:0.3px">パスワード（6文字以上）</div>
+        <input type="text" id="auth-password" placeholder="パスワードを入力" style="margin-bottom:20px;height:42px;border-radius:10px;border:1.5px solid #ececec;background:#fafafa;width:100%;padding:0 12px;font-size:13px;-webkit-appearance:none" autocomplete="new-password">
+        <button class="primary" onclick="signIn()" style="margin-bottom:10px">ログイン</button>
+        <button class="secondary" onclick="signUp()" style="width:100%">新規登録</button>
+      </div>
+      <div id="login-status" style="font-size:12px;color:#e53935;margin-top:12px;text-align:center;font-weight:500"></div>
+      <div id="confirm-msg" style="display:none;background:#f1f8e9;border-radius:10px;padding:12px;margin-top:12px;font-size:13px;color:#2e7d32;text-align:center">
+        確認メールを送りました！<br>メール内のリンクをクリックして登録完了してください。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ペア設定画面 -->
+<div id="screen-pair" class="screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:24px">
+  <div style="background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 2px 16px rgba(0,0,0,0.08)">
+    <div style="font-size:18px;font-weight:700;margin-bottom:4px">ペアを設定する</div>
+    <div style="font-size:13px;color:#888;margin-bottom:20px">相手と2人でペアを作って送迎を記録します</div>
+
+    <div style="margin-bottom:20px">
+      <div class="sec-title">新しいペアを作る</div>
+      <div class="label">表示名（例：髙井家）</div>
+      <input type="text" id="pair-myname" placeholder="あなたの表示名" style="margin-bottom:10px">
+      <div class="label">ペア名（例：さくらチーム送迎）</div>
+      <input type="text" id="pair-name" placeholder="ペアの名前" style="margin-bottom:10px">
+      <button class="primary" onclick="createPair()">ペアを作成して招待コードを発行</button>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px;margin:16px 0">
+      <div style="flex:1;height:1px;background:#e0e0e0"></div>
+      <div style="font-size:12px;color:#aaa">または</div>
+      <div style="flex:1;height:1px;background:#e0e0e0"></div>
+    </div>
+
+    <div>
+      <div class="sec-title">招待コードで参加する</div>
+      <div class="label">表示名（例：宮城家）</div>
+      <input type="text" id="join-myname" placeholder="あなたの表示名" style="margin-bottom:10px">
+      <div class="label">招待コード（6桁）</div>
+      <input type="text" id="join-code" placeholder="123456" maxlength="6" style="margin-bottom:10px;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px">
+      <button class="primary" onclick="joinPair()">参加する</button>
+    </div>
+
+    <div style="margin-top:16px;text-align:center">
+      <button class="small" onclick="logout()">ログアウト</button>
+    </div>
+  </div>
+</div>
+
+<!-- 招待コード表示画面 -->
+<div id="screen-invite" class="screen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:24px">
+  <div style="background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 2px 16px rgba(0,0,0,0.08);text-align:center">
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px">ペアを作成しました！</div>
+    <div style="font-size:13px;color:#888;margin-bottom:16px">この招待コードを相手に伝えてください</div>
+    <div class="invite-code" id="invite-code-display">------</div>
+    <div style="font-size:12px;color:#aaa;margin-bottom:20px">相手がこのコードを入力すると参加できます</div>
+    <button class="primary" onclick="goToMain()">アプリを使い始める</button>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div id="screen-main" class="screen" style="display:none">
+  <div class="header">
+    <div class="header-logo">
+      <div class="header-icon">
+        <svg width="16" height="16" viewBox="0 0 40 40" fill="none">
+          <path d="M6 26 L10 16 Q12 12 16 12 L24 12 Q28 12 30 16 L34 26" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+          <rect x="4" y="24" width="32" height="10" rx="4" fill="#fff"/>
+          <circle cx="12" cy="34" r="3.5" fill="#1a1a1a" stroke="#fff" stroke-width="2"/>
+          <circle cx="28" cy="34" r="3.5" fill="#1a1a1a" stroke="#fff" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="header-title">送迎くん</div>
+    </div>
+    <button class="user-badge" id="user-badge-label">— 設定</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('log')">記録</button>
+    <button class="tab" onclick="showTab('summary')">集計</button>
+    <button class="tab" onclick="showTab('history')">履歴</button>
+    <button class="tab" onclick="showTab('settings')">設定</button>
+    <button class="tab" onclick="showTab('guide')">ガイド</button>
+  </div>
+  <div class="container">
+
+    <!-- 記録タブ -->
+    <div id="tab-log">
+      <div class="card">
+        <div class="sec-title">出発地・到着地</div>
+        <div class="row">
+          <div class="field">
+            <div class="label">出発地</div>
+            <select id="sel-from" onchange="onFromChange()">
+              <option value="">— 選択 —</option>
+              <optgroup label="自宅・駅">
+                <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
+                <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
+                <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
+                <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+                <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
+              </optgroup>
+              <optgroup label="試合・練習会場">
+                <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+                <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+                <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+                <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+                <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+                <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+                <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+                <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+                <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+                <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
+              </optgroup>
+              <option value="__free__">その他（自由入力）</option>
+            </select>
+          </div>
+        </div>
+        <div id="from-free-wrap" style="display:none" class="row">
+          <div class="field"><input type="text" id="from-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <div class="label">到着地</div>
+            <select id="sel-to" onchange="onToChange()">
+              <option value="">— 選択 —</option>
+              <optgroup label="自宅・駅">
+                <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
+                <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
+                <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
+                <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+                <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
+              </optgroup>
+              <optgroup label="試合・練習会場">
+                <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+                <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+                <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+                <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+                <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+                <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+                <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+                <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+                <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+                <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
+              </optgroup>
+              <option value="__free__">その他（自由入力）</option>
+            </select>
+          </div>
+        </div>
+        <div id="to-free-wrap" style="display:none" class="row">
+          <div class="field"><input type="text" id="to-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
+        </div>
+        <div id="maps-area" style="display:none">
+          <div class="maps-box">
+            <a id="maps-link" href="#" target="_blank">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Google Maps でルート確認
+            </a>
+            <div class="maps-hint">表示された距離（km）を下の欄に入力してください</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-title">送迎を記録</div>
+        <div class="row">
+          <div class="field"><div class="label">日付</div><input type="date" id="inp-date"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <div class="label">運転した人</div>
+            <select id="inp-driver" onchange="updatePassengerList()">
+              <option value="">— 選択 —</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <div class="label" style="margin-bottom:6px">乗せた人（複数選択可）</div>
+          <div id="passenger-list" style="display:flex;flex-direction:column;gap:6px"></div>
+        </div>
+        <div class="row">
+          <div class="field"><div class="label">メモ</div><input type="text" id="inp-note" placeholder="例：髙井家 → コザしんきんドーム"></div>
+        </div>
+        <div class="row">
+          <div class="field"><div class="label">片道 / 往復</div>
+            <select id="inp-trip" onchange="updatePreview()">
+              <option value="1">片道</option>
+              <option value="2">往復（×2）</option>
+            </select>
+          </div>
+          <div class="field"><div class="label">片道距離 (km)</div><input type="number" id="inp-km" placeholder="0" min="0" step="0.1" oninput="updatePreview()"></div>
+        </div>
+        <div class="row">
+          <div class="field"><div class="label">高速代 (円)</div><input type="number" id="inp-toll" placeholder="0" min="0" oninput="updatePreview()"></div>
+          <div class="field"><div class="label">その他 (円)</div><input type="number" id="inp-other" placeholder="0" min="0" oninput="updatePreview()"></div>
+        </div>
+        <div class="preview" id="preview-cost"></div>
+        <button class="primary" onclick="addEntry()">記録する</button>
+      </div>
+    </div>
+
+    <!-- 集計タブ -->
+    <div id="tab-summary" style="display:none">
+      <div class="card" style="margin-bottom:12px">
+        <div class="period-row">
+          <button class="small" id="btn-week" onclick="setPeriod('week')">今週</button>
+          <button class="small" id="btn-month" onclick="setPeriod('month')">今月</button>
+          <button class="small" id="btn-all" onclick="setPeriod('all')">全期間</button>
+          <button class="small" id="btn-custom" onclick="setPeriod('custom')">期間指定</button>
+          <button class="small" onclick="renderSummary()" style="margin-left:auto">更新</button>
+        </div>
+        <div id="custom-range" style="display:none">
+          <div class="row" style="margin-bottom:0">
+            <div class="field"><div class="label">開始日</div><input type="date" id="range-from"></div>
+            <div class="field"><div class="label">終了日</div><input type="date" id="range-to"></div>
+            <button class="small" onclick="renderSummary()" style="align-self:flex-end;height:40px">適用</button>
+          </div>
+        </div>
+      </div>
+      <div class="metric-grid" id="summary-metrics"></div>
+      <div class="card" id="summary-detail"></div>
+    </div>
+
+    <!-- 履歴タブ -->
+    <div id="tab-history" style="display:none">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button class="small" onclick="renderHistory()">更新</button>
+      </div>
+      <div class="card"><div id="history-list"></div></div>
+    </div>
+
+    <!-- 設定タブ -->
+    <div id="tab-settings" style="display:none">
+      <div class="card">
+        <div class="sec-title">ペア情報</div>
+        <div id="pair-info"></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="secondary" onclick="showInviteCode()" style="flex:1">招待コードを確認</button>
+          <button class="danger-sm" onclick="leavePair()" style="flex:1;height:40px">ペアから抜ける</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title">計算設定</div>
+        <div class="setting-row">
+          <span>ガソリン単価（円/L）</span>
+          <input type="number" id="set-price" style="width:80px;text-align:right" value="175" min="100" max="300" oninput="updateUnitCost()">
+        </div>
+        <div class="setting-row">
+          <span>燃費（km/L）</span>
+          <input type="number" id="set-fuel" style="width:80px;text-align:right" value="12" min="5" max="30" step="0.1" oninput="updateUnitCost()">
+        </div>
+        <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:2px">
+          <span style="color:#aaa;font-size:12px">1kmあたりのガソリン代</span>
+          <span id="unit-cost" style="font-size:15px;font-weight:600"></span>
+        </div>
+        <button class="secondary" onclick="saveSettings()" style="width:100%;margin-top:12px">保存</button>
+      </div>
+      <div class="card" style="text-align:center">
+        <button class="secondary" onclick="logout()" style="width:100%">ログアウト</button>
+      </div>
+    </div>
+
+    <!-- ガイドタブ -->
+    <div id="tab-guide" style="display:none">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:40px;height:40px;background:#1a1a1a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 40 40" fill="none"><path d="M6 26 L10 16 Q12 12 16 12 L24 12 Q28 12 30 16 L34 26" stroke="#fff" stroke-width="3" stroke-linecap="round"/><rect x="4" y="24" width="32" height="10" rx="4" fill="#fff"/><circle cx="12" cy="34" r="3.5" fill="#1a1a1a" stroke="#fff" stroke-width="2"/><circle cx="28" cy="34" r="3.5" fill="#1a1a1a" stroke="#fff" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <div style="font-size:16px;font-weight:800">送迎くん</div>
+            <div style="font-size:12px;color:#aaa">使い方ガイド</div>
+          </div>
+        </div>
+        <div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#555;line-height:1.7;border:1px solid #f0f0f0">
+          送迎費用を2家庭間で記録・折半するアプリです。メールアドレスで登録して、招待コードで相手とペアを組んで使います。
+        </div>
+
+        <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">はじめかた</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">1</div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">メールアドレスで新規登録</div><div style="font-size:12px;color:#999">アプリを開いてメールアドレスとパスワード（6文字以上）を入力して「新規登録」をタップ</div></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">2</div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">ペアを作成する</div><div style="font-size:12px;color:#999">「新しいペアを作る」で表示名（例：髙井家）とペア名を入力して作成。6桁の招待コードが発行されます</div></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">3</div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">招待コードを相手に送る</div><div style="font-size:12px;color:#999">6桁のコードをLINEなどで相手に共有。相手も同じアプリでアカウント登録後、コードを入力して参加</div></div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">4</div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">準備完了！記録を始める</div><div style="font-size:12px;color:#999">ペアが成立したら送迎の記録ができます。複数人が同じ招待コードで参加もOKです</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">送迎を記録する</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="border-left:2px solid #1a1a1a;padding-left:10px">
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">出発地・到着地を選ぶ</div>
+              <div style="font-size:11px;color:#999">プルダウンから選ぶとGoogle Mapsのルート確認ボタンが出ます</div>
+            </div>
+            <div style="border-left:2px solid #1a1a1a;padding-left:10px">
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">Google Mapsで距離を確認して入力</div>
+              <div style="font-size:11px;color:#999">ボタンをタップ→地図アプリで表示された距離（km）を入力</div>
+            </div>
+            <div style="border-left:2px solid #1a1a1a;padding-left:10px">
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">片道 / 往復を選ぶ</div>
+              <div style="font-size:11px;color:#999">往復を選ぶと距離・高速代が自動で2倍になります</div>
+            </div>
+            <div style="border-left:2px solid #1a1a1a;padding-left:10px">
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">「記録する」をタップ</div>
+              <div style="font-size:11px;color:#999">「記録しました」と出たら保存完了！相手にもすぐ反映されます</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">集計の見方</div>
+          <div style="background:#f1f8e9;border-radius:10px;padding:12px;font-size:12px;color:#444;line-height:1.7;border-left:3px solid #66bb6a">
+            「A → Bへ ○○円 お支払い（折半）」と表示された場合、AがBへその金額を支払います。今週・今月・全期間・期間指定で絞り込めます。
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #f5f5f5;padding-top:14px">
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">よくある質問</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">履歴に表示されない</div>
+              <div style="font-size:11px;color:#999">「更新」ボタンをタップしてください。</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">招待コードを忘れた</div>
+              <div style="font-size:11px;color:#999">「設定」タブの「ペア情報」から確認できます。</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">誤って記録した</div>
+              <div style="font-size:11px;color:#999">「履歴」タブで自分が登録した記録の「削除」をタップしてください。</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">複数人で使いたい</div>
+              <div style="font-size:11px;color:#999">同じ招待コードで複数人が参加できます。それぞれがアカウント登録してコードを入力してください。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://flrwnckbxfkxuhcqjzfs.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZscnduY2tieGZreHVoY3FqemZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTY2MzYsImV4cCI6MjA5MjI5MjYzNn0.4xHPHr6_s09wppe4oE4yj-6nI7aF-cDY57W8egjyKC8';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const LS = 'sougei_v1';
+let currentUser = null;
+let currentPair = null;
+let myMember = null;
+let currentPeriod = 'month';
+
+function lsGet() { try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch(e) { return {}; } }
+function lsSet(d) { localStorage.setItem(LS, JSON.stringify(d)); }
+function getSettings() { const d = lsGet(); return { price: d.price || 175, fuel: d.fuel || 12 }; }
+
+function calcGas(km, s) { return km / s.fuel * s.price; }
+function entryTotal(e, s) { return calcGas(e.km || 0, s) + (e.toll || 0) + (e.other || 0); }
+function fmt(n) { return Math.round(n).toLocaleString() + '円'; }
+function fmtKm(n) { return parseFloat(n).toFixed(1) + 'km'; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function showScreen(name) {
+  ['login','pair','invite','main'].forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    if (s === name) {
+      el.style.display = ['pair','invite','login'].includes(s) ? 'flex' : 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+async function signIn() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { document.getElementById('login-status').textContent = 'メールとパスワードを入力してください'; return; }
+  document.getElementById('login-status').textContent = 'ログイン中...';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { document.getElementById('login-status').textContent = 'エラー: ' + error.message; }
+}
+
+async function signUp() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { document.getElementById('login-status').textContent = 'メールとパスワードを入力してください'; return; }
+  if (password.length < 6) { document.getElementById('login-status').textContent = 'パスワードは6文字以上にしてください'; return; }
+  document.getElementById('login-status').textContent = '登録中...';
+  const { error } = await sb.auth.signUp({
+    email, password,
+    options: { emailRedirectTo: window.location.href }
+  });
+  if (error) { document.getElementById('login-status').textContent = 'エラー: ' + error.message; }
+  else {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('confirm-msg').style.display = 'block';
+    document.getElementById('login-status').textContent = '';
+  }
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  currentUser = null; currentPair = null; myMember = null;
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('confirm-msg').style.display = 'none';
+  document.getElementById('login-status').textContent = '';
+  showScreen('login');
+}
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showScreen('login'); return; }
+  currentUser = session.user;
+
+  const { data: members } = await sb.from('pair_members')
+    .select('*, pairs(*)')
+    .eq('user_id', currentUser.id)
+    .limit(1);
+
+  if (members && members.length > 0) {
+    myMember = members[0];
+    currentPair = members[0].pairs;
+    enterMain();
+  } else {
+    showScreen('pair');
+  }
+}
+
+function generateCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function createPair() {
+  const myname = document.getElementById('pair-myname').value.trim();
+  const pairname = document.getElementById('pair-name').value.trim();
+  if (!myname || !pairname) { showToast('表示名とペア名を入力してください'); return; }
+
+  const code = generateCode();
+  const { data: pair, error: pe } = await sb.from('pairs')
+    .insert({ invite_code: code, name: pairname })
+    .select().single();
+  if (pe) { showToast('エラー: ' + pe.message); return; }
+
+  const { error: me } = await sb.from('pair_members')
+    .insert({ pair_id: pair.id, user_id: currentUser.id, display_name: myname });
+  if (me) { showToast('エラー: ' + me.message); return; }
+
+  currentPair = pair;
+  const { data: member } = await sb.from('pair_members').select('*').eq('user_id', currentUser.id).eq('pair_id', pair.id).single();
+  myMember = member;
+
+  document.getElementById('invite-code-display').textContent = code;
+  showScreen('invite');
+}
+
+async function joinPair() {
+  const myname = document.getElementById('join-myname').value.trim();
+  const code = document.getElementById('join-code').value.trim();
+  if (!myname || !code) { showToast('表示名と招待コードを入力してください'); return; }
+
+  const { data: pairs, error: pe } = await sb.from('pairs').select('*').eq('invite_code', code);
+  if (pe || !pairs || pairs.length === 0) { showToast('招待コードが見つかりません'); return; }
+
+  const pair = pairs[0];
+  const { error: me } = await sb.from('pair_members')
+    .insert({ pair_id: pair.id, user_id: currentUser.id, display_name: myname });
+  if (me) { showToast('エラー: ' + me.message); return; }
+
+  currentPair = pair;
+  const { data: member } = await sb.from('pair_members').select('*').eq('user_id', currentUser.id).eq('pair_id', pair.id).single();
+  myMember = member;
+  enterMain();
+}
+
+function goToMain() { enterMain(); }
+
+function enterMain() {
+  document.getElementById('user-badge-label').textContent = (myMember?.display_name || '') + ' 設定';
+  const s = getSettings();
+  document.getElementById('set-price').value = s.price;
+  document.getElementById('set-fuel').value = s.fuel;
+  document.getElementById('inp-date').value = new Date().toISOString().slice(0, 10);
+  updateUnitCost(); updatePreview();
+  renderPairInfo();
+  loadMembers().then(members => {
+    renderDriverSelect(members);
+    renderPassengerList(members);
+  });
+  showScreen('main');
+}
+
+function renderDriverSelect(members) {
+  const sel = document.getElementById('inp-driver');
+  sel.innerHTML = '<option value="">— 選択 —</option>';
+  members.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.user_id;
+    opt.textContent = m.display_name;
+    if (m.user_id === currentUser.id) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  updatePassengerList();
+}
+
+function updatePassengerList() {
+  loadMembers().then(members => renderPassengerList(members));
+}
+
+function renderPassengerList(members) {
+  const driverId = document.getElementById('inp-driver').value;
+  const container = document.getElementById('passenger-list');
+  const passengers = members.filter(m => m.user_id !== driverId);
+  container.innerHTML = passengers.map(m => `
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fafafa;border-radius:10px;border:1.5px solid #ececec;cursor:pointer">
+      <input type="checkbox" name="passenger" value="${m.user_id}" style="width:18px;height:18px;accent-color:#1a1a1a;cursor:pointer">
+      <span style="font-size:13px;font-weight:500">${m.display_name}</span>
+    </label>
+  `).join('');
+  updatePreview();
+}
+
+function renderPairInfo() {
+  const el = document.getElementById('pair-info');
+  if (!currentPair || !myMember) return;
+  el.innerHTML = `
+    <div class="setting-row"><span>ペア名</span><span style="font-weight:600">${currentPair.name}</span></div>
+    <div class="setting-row"><span>あなたの表示名</span><span style="font-weight:600">${myMember.display_name}</span></div>
+    <div class="setting-row"><span>招待コード</span><span style="font-weight:600;letter-spacing:3px">${currentPair.invite_code}</span></div>
+  `;
+}
+
+async function showInviteCode() {
+  showToast('招待コード: ' + currentPair.invite_code);
+}
+
+async function leavePair() {
+  if (!confirm('ペアから抜けますか？記録は残ります。')) return;
+  await sb.from('pair_members').delete().eq('user_id', currentUser.id).eq('pair_id', currentPair.id);
+  currentPair = null; myMember = null;
+  showScreen('pair');
+}
+
+function getSelectedAddr(selId, freeId) {
+  const sel = document.getElementById(selId);
+  if (sel.value === '__free__') return document.getElementById(freeId).value.trim();
+  if (!sel.value) return '';
+  return sel.options[sel.selectedIndex].getAttribute('data-addr') || sel.value;
+}
+function getSelectedName(selId, freeId) {
+  const sel = document.getElementById(selId);
+  if (sel.value === '__free__') return document.getElementById(freeId).value.trim();
+  return sel.value || '';
+}
+function onFromChange() {
+  document.getElementById('from-free-wrap').style.display = document.getElementById('sel-from').value === '__free__' ? 'flex' : 'none';
+  updateMapsLink();
+}
+function onToChange() {
+  document.getElementById('to-free-wrap').style.display = document.getElementById('sel-to').value === '__free__' ? 'flex' : 'none';
+  updateMapsLink();
+}
+function updateMapsLink() {
+  const fa = getSelectedAddr('sel-from', 'from-free');
+  const ta = getSelectedAddr('sel-to', 'to-free');
+  const area = document.getElementById('maps-area');
+  if (fa && ta) {
+    document.getElementById('maps-link').href = 'https://www.google.com/maps/dir/' + encodeURIComponent(fa) + '/' + encodeURIComponent(ta) + '/?hl=ja&dirflg=d';
+    area.style.display = 'block';
+    autoFillNote();
+  } else { area.style.display = 'none'; }
+}
+function autoFillNote() {
+  const from = getSelectedName('sel-from', 'from-free');
+  const to = getSelectedName('sel-to', 'to-free');
+  if (from && to) document.getElementById('inp-note').value = from + ' → ' + to;
+}
+function updatePreview() {
+  const s = getSettings();
+  const km = parseFloat(document.getElementById('inp-km').value) || 0;
+  const trip = parseInt(document.getElementById('inp-trip').value) || 1;
+  const totalKm = km * trip;
+  const toll = parseFloat(document.getElementById('inp-toll').value) || 0;
+  const totalToll = toll * trip;
+  const other = parseFloat(document.getElementById('inp-other').value) || 0;
+  const totalCost = calcGas(totalKm, s) + totalToll + other;
+  const checkedCount = document.querySelectorAll('input[name="passenger"]:checked').length;
+  const splitCount = checkedCount + 1;
+  const perFamily = splitCount > 1 ? Math.round(totalCost / splitCount) : 0;
+  document.getElementById('preview-cost').textContent =
+    (km > 0 || toll > 0 || other > 0)
+      ? `合計 ${fmt(totalCost)}　${splitCount > 1 ? `÷${splitCount}家族 = 1家族あたり ${fmt(perFamily)}` : '（乗せた人を選んでください）'}`
+      : '';
+}
+
+async function addEntry() {
+  if (!currentPair) { showToast('ペアが設定されていません'); return; }
+  const date = document.getElementById('inp-date').value;
+  if (!date) { showToast('日付を入力してください'); return; }
+  const driverId = document.getElementById('inp-driver').value;
+  if (!driverId) { showToast('運転した人を選んでください'); return; }
+  const passengerIds = Array.from(document.querySelectorAll('input[name="passenger"]:checked')).map(cb => cb.value);
+  if (passengerIds.length === 0) { showToast('乗せた人を選んでください'); return; }
+
+  const kmRaw = parseFloat(document.getElementById('inp-km').value) || 0;
+  const trip = parseInt(document.getElementById('inp-trip').value) || 1;
+  const toll = parseFloat(document.getElementById('inp-toll').value) || 0;
+  const splitCount = passengerIds.length + 1;
+
+  const entry = {
+    pair_id: currentPair.id,
+    user_id: currentUser.id,
+    driver_id: driverId,
+    passengers: passengerIds,
+    date,
+    dir: driverId === currentUser.id ? 'send' : 'recv',
+    note: document.getElementById('inp-note').value.trim(),
+    from_place: getSelectedName('sel-from', 'from-free'),
+    to_place: getSelectedName('sel-to', 'to-free'),
+    km: Math.round(kmRaw * trip * 10) / 10,
+    toll: Math.round(toll * trip),
+    other: parseFloat(document.getElementById('inp-other').value) || 0,
+    trip,
+  };
+  const btn = document.querySelector('#tab-log button.primary');
+  btn.textContent = '保存中...'; btn.disabled = true;
+  const { error } = await sb.from('entries').insert(entry);
+  if (error) { showToast('保存失敗: ' + error.message); }
+  else {
+    ['inp-km','inp-toll','inp-other','inp-note'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('sel-from').value = '';
+    document.getElementById('sel-to').value = '';
+    document.getElementById('from-free-wrap').style.display = 'none';
+    document.getElementById('to-free-wrap').style.display = 'none';
+    document.getElementById('maps-area').style.display = 'none';
+    document.getElementById('inp-trip').value = '1';
+    document.querySelectorAll('input[name="passenger"]').forEach(cb => cb.checked = false);
+    updatePreview();
+    showToast('記録しました');
+  }
+  btn.textContent = '記録する'; btn.disabled = false;
+}
+
+async function loadEntries() {
+  if (!currentPair) return [];
+  const { data, error } = await sb.from('entries')
+    .select('*')
+    .eq('pair_id', currentPair.id)
+    .order('date', { ascending: false });
+  if (error) { console.error(error); return []; }
+  return data || [];
+}
+
+function getFiltered(entries, period) {
+  const now = new Date();
+  return entries.filter(e => {
+    if (period === 'all') return true;
+    const d = new Date(e.date.replace(/-/g, '/'));
+    if (period === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    if (period === 'week') {
+      const day = now.getDay() || 7;
+      const mon = new Date(now); mon.setDate(now.getDate() - day + 1); mon.setHours(0,0,0,0);
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23,59,59,999);
+      return d >= mon && d <= sun;
+    }
+    if (period === 'custom') {
+      const from = document.getElementById('range-from').value;
+      const to = document.getElementById('range-to').value;
+      if (from && d < new Date(from.replace(/-/g, '/'))) return false;
+      if (to && d > new Date(to.replace(/-/g, '/') + ' 23:59:59')) return false;
+      return true;
+    }
+    return true;
+  });
+}
+function setPeriod(p) {
+  currentPeriod = p;
+  document.getElementById('custom-range').style.display = p === 'custom' ? 'block' : 'none';
+  if (p !== 'custom') renderSummary();
+}
+
+async function renderSummary() {
+  ['week','month','all','custom'].forEach(p => {
+    const b = document.getElementById('btn-' + p);
+    if (b) b.style.fontWeight = p === currentPeriod ? '700' : '400';
+  });
+  const s = getSettings();
+  document.getElementById('summary-metrics').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:12px;color:#aaa;font-size:13px"><span class="spin"></span>読込中...</div>';
+  const all = await loadEntries();
+  const entries = getFiltered(all, currentPeriod);
+  const members = await loadMembers();
+  const nameMap = {};
+  members.forEach(m => { nameMap[m.user_id] = m.display_name; });
+
+  // 各メンバーが「支払うべき額」と「受け取るべき額」を計算
+  const balance = {};
+  members.forEach(m => { balance[m.user_id] = 0; });
+
+  entries.forEach(e => {
+    const total = entryTotal(e, s);
+    const dId = e.driver_id || e.user_id;
+    let pIds;
+    if (Array.isArray(e.passengers) && e.passengers.length > 0) {
+      pIds = e.passengers;
+      if (pIds.length === 0) return;
+      const splitCount = pIds.length + 1;
+      const perFamily = total / splitCount;
+      pIds.forEach(pid => {
+        if (balance[pid] !== undefined) balance[pid] -= perFamily;
+        if (balance[dId] !== undefined) balance[dId] += perFamily;
+      });
+    } else {
+      // 旧データ：send=髙井家ドライバー、recv=宮城家ドライバー
+      // メンバーから髙井家・宮城家のuser_idを特定
+      const takaiMember = members.find(m => m.display_name === '髙井家');
+      const miyagiMember = members.find(m => m.display_name === '宮城家');
+      if (!takaiMember || !miyagiMember) return;
+      const driverId = e.dir === 'send' ? takaiMember.user_id : miyagiMember.user_id;
+      const passengerId = e.dir === 'send' ? miyagiMember.user_id : takaiMember.user_id;
+      const perFamily = total / 2;
+      if (balance[passengerId] !== undefined) balance[passengerId] -= perFamily;
+      if (balance[driverId] !== undefined) balance[driverId] += perFamily;
+    }
+  });
+
+  // メトリクス表示（各メンバーの収支）
+  const metricsHtml = members.map(m => {
+    const val = balance[m.user_id] || 0;
+    const color = val > 0 ? '#2e7d32' : val < 0 ? '#c62828' : '#1a1a1a';
+    const label = val > 0 ? '受取' : val < 0 ? '支払' : '±0';
+    return `<div class="metric">
+      <div class="mlabel">${m.display_name}</div>
+      <div class="val" style="font-size:15px;color:${color}">${val >= 0 ? '+' : ''}${fmt(val)}</div>
+      <div style="font-size:10px;color:#aaa;margin-top:2px">${label}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('summary-metrics').innerHTML = metricsHtml;
+
+  let detail = `<div class="sec-title">内訳（${entries.length}件）</div>`;
+  if (!entries.length) {
+    detail += '<div class="empty">この期間の記録はありません</div>';
+  } else {
+    const gasT = entries.reduce((a, e) => a + calcGas(e.km||0, s), 0);
+    const tollT = entries.reduce((a, e) => a + (e.toll||0), 0);
+    const kmT = entries.reduce((a, e) => a + (e.km||0), 0);
+    detail += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+      <div><div class="label">ガソリン代</div><div style="font-weight:700;font-size:14px">${fmt(gasT)}</div></div>
+      <div><div class="label">高速代</div><div style="font-weight:700;font-size:14px">${fmt(tollT)}</div></div>
+      <div><div class="label">総走行距離</div><div style="font-weight:700;font-size:14px">${kmT.toFixed(1)}km</div></div>
+    </div>`;
+
+    // 支払い案内
+    const payments = [];
+    members.forEach(from => {
+      if ((balance[from.user_id] || 0) < -1) {
+        // この人が支払うべき相手を探す（最もプラスの人）
+        const receiver = members.filter(m => (balance[m.user_id] || 0) > 1)
+          .sort((a, b) => (balance[b.user_id] || 0) - (balance[a.user_id] || 0))[0];
+        if (receiver) {
+          payments.push(`${from.display_name} → ${receiver.display_name}へ ${fmt(Math.abs(balance[from.user_id]))} お支払い`);
+        }
+      }
+    });
+    if (payments.length > 0) {
+      payments.forEach(p => {
+        detail += `<div class="alert-pay" style="margin-top:8px">${p}</div>`;
+      });
+    } else {
+      detail += `<div class="hint" style="margin-top:8px">ちょうど釣り合っています</div>`;
+    }
+  }
+  document.getElementById('summary-detail').innerHTML = detail;
+}
+
+async function loadMembers() {
+  if (!currentPair) return [];
+  const { data } = await sb.from('pair_members').select('*').eq('pair_id', currentPair.id);
+  return data || [];
+}
+
+async function renderHistory() {
+  const s = getSettings();
+  document.getElementById('history-list').innerHTML = '<div style="text-align:center;padding:16px;color:#aaa"><span class="spin"></span>読込中...</div>';
+  const entries = await loadEntries();
+  const members = await loadMembers();
+  const nameMap = {};
+  members.forEach(m => { nameMap[m.user_id] = m.display_name; });
+
+  const list = document.getElementById('history-list');
+  if (!entries.length) { list.innerHTML = '<div class="empty">記録がありません</div>'; return; }
+  const weekdays = ['日','月','火','水','木','金','土'];
+  list.innerHTML = entries.map(e => {
+    const total = entryTotal(e, s);
+    const gas = calcGas(e.km || 0, s);
+    const driverId = e.driver_id || e.user_id;
+    const driverName = nameMap[driverId] || '不明';
+    let pIds, passengerNames, displayDriverName;
+    if (Array.isArray(e.passengers) && e.passengers.length > 0) {
+      pIds = e.passengers;
+      passengerNames = pIds.map(id => nameMap[id] || '不明').join('・');
+      displayDriverName = driverName;
+    } else {
+      // 旧データ：send=髙井家がドライバー、recv=宮城家がドライバー
+      if (e.dir === 'send') {
+        displayDriverName = '髙井家';
+        passengerNames = '宮城家';
+      } else {
+        displayDriverName = '宮城家';
+        passengerNames = '髙井家';
+      }
+      pIds = [null];
+    }
+    const splitCount = pIds.length + 1;
+    const perFamily = Math.round(total / splitCount);
+    const route = e.from_place && e.to_place ? `${e.from_place}→${e.to_place}` : (e.note || '—');
+    const d = new Date(e.date.replace(/-/g, '/'));
+    const dateStr = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日（${weekdays[d.getDay()]}）`;
+    const tripLabel = e.trip === 2 ? '往復' : '片道';
+    const isMe = e.user_id === currentUser.id;
+    return `<div class="log-entry">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px;margin-bottom:3px">${dateStr}</div>
+        <div style="font-size:12px;color:#666;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${route}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+          <span style="font-size:11px;background:#f0f0f0;padding:2px 8px;border-radius:999px;font-weight:600">🚗 ${displayDriverName}</span>
+          <span style="font-size:11px;color:#aaa">→</span>
+          <span style="font-size:11px;background:#f0f0f0;padding:2px 8px;border-radius:999px">${passengerNames}</span>
+        </div>
+        <div style="font-size:11px;color:#aaa">${e.km ? fmtKm(e.km)+'（'+tripLabel+'）　' : ''}ガソリン${fmt(gas)}${e.toll ? '　高速'+fmt(e.toll) : ''}</div>
+        <div style="font-size:11px;color:#888;margin-top:2px;font-weight:600">${splitCount}家族 合計${fmt(total)} → 1家族あたり ${fmt(perFamily)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:8px">
+        <div style="font-weight:800;font-size:14px">${fmt(total)}</div>
+        ${isMe ? `<button class="danger-sm" onclick="doDelete('${e.id}')">削除</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function doDelete(id) {
+  if (!confirm('この記録を削除しますか？')) return;
+  const { error } = await sb.from('entries').delete().eq('id', id);
+  if (error) { showToast('削除失敗: ' + error.message); }
+  else { showToast('削除しました'); renderHistory(); }
+}
+
+function updateUnitCost() {
+  const price = parseFloat(document.getElementById('set-price').value) || 175;
+  const fuel = parseFloat(document.getElementById('set-fuel').value) || 12;
+  document.getElementById('unit-cost').textContent = `約 ${(price / fuel).toFixed(1)} 円/km`;
+}
+function saveSettings() {
+  const d = lsGet();
+  d.price = parseFloat(document.getElementById('set-price').value) || 175;
+  d.fuel = parseFloat(document.getElementById('set-fuel').value) || 12;
+  lsSet(d); updateUnitCost(); showToast('保存しました');
+}
+
+function showTab(name) {
+  ['log','summary','history','settings','guide'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.className = 'tab' + (['log','summary','history','settings','guide'][i] === name ? ' active' : '');
+  });
+  if (name === 'summary') renderSummary();
+  if (name === 'history') renderHistory();
+  if (name === 'settings') { updateUnitCost(); renderPairInfo(); }
+}
+
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    currentUser = session.user;
+    init();
+  }
+});
+
+init();
+</script>
+</body>
+</html>
