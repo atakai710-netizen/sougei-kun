@@ -179,6 +179,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
     <button class="tab" onclick="showTab('history')">履歴</button>
     <button class="tab" onclick="showTab('settings')">設定</button>
     <button class="tab" onclick="showTab('guide')">ガイド</button>
+    <button class="tab" id="tab-admin-btn" style="display:none;color:#e53935" onclick="showTab('admin')">管理</button>
   </div>
   <div class="container">
 
@@ -343,6 +344,12 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         <input type="text" id="new-display-name" placeholder="例：髙井家パパ" style="margin-bottom:10px">
         <button class="secondary" onclick="updateDisplayName()" style="width:100%">変更する</button>
       </div>
+      <div class="card" id="pair-name-card" style="display:none">
+        <div class="sec-title">グループ名を変更</div>
+        <div class="label" style="margin-bottom:4px">新しいグループ名</div>
+        <input type="text" id="new-pair-name" placeholder="例：さくらチーム送迎" style="margin-bottom:10px">
+        <button class="secondary" onclick="updatePairName()" style="width:100%">変更する</button>
+      </div>
       <div class="card">
         <div class="sec-title">計算設定</div>
         <div class="setting-row">
@@ -455,6 +462,30 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
       </div>
     </div>
 
+    <!-- 管理タブ -->
+    <div id="tab-admin" style="display:none">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec-title" style="margin-bottom:0">メンバー一覧</div>
+          <button class="small" onclick="renderAdmin()">更新</button>
+        </div>
+        <div id="admin-members"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec-title" style="margin-bottom:0">月別統計</div>
+        </div>
+        <div id="admin-stats"></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="sec-title" style="margin-bottom:0">全記録</div>
+          <button class="small" onclick="renderAdminEntries()">更新</button>
+        </div>
+        <div id="admin-entries"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -465,6 +496,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
 const SUPABASE_URL = 'https://flrwnckbxfkxuhcqjzfs.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZscnduY2tieGZreHVoY3FqemZzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MTY2MzYsImV4cCI6MjA5MjI5MjYzNn0.4xHPHr6_s09wppe4oE4yj-6nI7aF-cDY57W8egjyKC8';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const ADMIN_EMAIL = 'a.takai710@gmail.com';
 
 const LS = 'sougei_v1';
 let currentUser = null;
@@ -615,6 +647,11 @@ function enterMain() {
     renderDriverSelect(members);
     renderPassengerList(members);
   });
+  // 管理者タブ・グループ名変更カード表示
+  if (currentUser?.email === ADMIN_EMAIL) {
+    document.getElementById('tab-admin-btn').style.display = 'flex';
+    document.getElementById('pair-name-card').style.display = 'block';
+  }
   showScreen('main');
 }
 
@@ -997,15 +1034,114 @@ function saveSettings() {
 }
 
 function showTab(name) {
-  ['log','summary','history','settings','guide'].forEach(t => {
+  ['log','summary','history','settings','guide','admin'].forEach(t => {
     document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
   });
-  document.querySelectorAll('.tab').forEach((el, i) => {
-    el.className = 'tab' + (['log','summary','history','settings','guide'][i] === name ? ' active' : '');
+  document.querySelectorAll('.tab').forEach(el => {
+    const onclick = el.getAttribute('onclick');
+    el.className = 'tab' + (onclick && onclick.includes(`'${name}'`) ? ' active' : '');
   });
   if (name === 'summary') renderSummary();
   if (name === 'history') renderHistory();
   if (name === 'settings') { updateUnitCost(); renderPairInfo(); }
+  if (name === 'admin') renderAdmin();
+}
+
+async function updatePairName() {
+  const newName = document.getElementById('new-pair-name').value.trim();
+  if (!newName) { showToast('新しいグループ名を入力してください'); return; }
+  const { error } = await sb.from('pairs')
+    .update({ name: newName })
+    .eq('id', currentPair.id);
+  if (error) { showToast('エラー: ' + error.message); return; }
+  currentPair.name = newName;
+  document.getElementById('new-pair-name').value = '';
+  renderPairInfo();
+  showToast('グループ名を変更しました！');
+}
+
+async function renderAdmin() {
+  const s = getSettings();
+  // メンバー一覧
+  document.getElementById('admin-members').innerHTML = '<div style="text-align:center;padding:12px;color:#aaa"><span class="spin"></span>読込中...</div>';
+  const members = await loadMembers();
+  const weekdays = ['日','月','火','水','木','金','土'];
+  if (!members.length) {
+    document.getElementById('admin-members').innerHTML = '<div class="empty">メンバーがいません</div>';
+  } else {
+    document.getElementById('admin-members').innerHTML = members.map(m => {
+      const d = new Date(m.created_at);
+      const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+      return `<div class="setting-row">
+        <div>
+          <div style="font-weight:700;font-size:13px">${m.display_name}</div>
+          <div style="font-size:11px;color:#aaa">${m.family_name || '—'}　登録：${dateStr}</div>
+        </div>
+        ${m.user_id !== currentUser.id ? `<button class="danger-sm" onclick="adminDeleteMember('${m.id}','${m.display_name}')">削除</button>` : '<span style="font-size:11px;color:#aaa">（自分）</span>'}
+      </div>`;
+    }).join('');
+  }
+
+  // 月別統計
+  const entries = await loadEntries();
+  const monthStats = {};
+  entries.forEach(e => {
+    const key = e.date.slice(0, 7);
+    if (!monthStats[key]) monthStats[key] = { count: 0, total: 0 };
+    monthStats[key].count++;
+    monthStats[key].total += entryTotal(e, s);
+  });
+  const months = Object.keys(monthStats).sort().reverse();
+  document.getElementById('admin-stats').innerHTML = months.length ? months.map(m => `
+    <div class="setting-row">
+      <span style="font-weight:600">${m.replace('-', '年')}月</span>
+      <span style="font-size:13px;color:#666">${monthStats[m].count}件　${fmt(monthStats[m].total)}</span>
+    </div>`).join('') : '<div class="empty">記録がありません</div>';
+
+  renderAdminEntries();
+}
+
+async function renderAdminEntries() {
+  const s = getSettings();
+  const members = await loadMembers();
+  const nameMap = {};
+  members.forEach(m => { nameMap[m.user_id] = m.display_name; });
+  const entries = await loadEntries();
+  const weekdays = ['日','月','火','水','木','金','土'];
+  document.getElementById('admin-entries').innerHTML = entries.length ? entries.map(e => {
+    const total = entryTotal(e, s);
+    const driverId = e.driver_id || e.user_id;
+    const driverName = nameMap[driverId] || '不明';
+    const d = new Date(e.date.replace(/-/g, '/'));
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}（${weekdays[d.getDay()]}）`;
+    const recorder = nameMap[e.user_id] || '不明';
+    return `<div class="log-entry">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700">${dateStr}　🚗 ${driverName}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">${e.note || e.from_place + '→' + e.to_place || '—'}　記録者：${recorder}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="font-weight:700;font-size:13px">${fmt(total)}</div>
+        <button class="danger-sm" onclick="adminDeleteEntry('${e.id}')">削除</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">記録がありません</div>';
+}
+
+async function adminDeleteMember(id, name) {
+  if (!confirm(`${name}をメンバーから削除しますか？`)) return;
+  const { error } = await sb.from('pair_members').delete().eq('id', id);
+  if (error) { showToast('エラー: ' + error.message); return; }
+  showToast(`${name}を削除しました`);
+  renderAdmin();
+}
+
+async function adminDeleteEntry(id) {
+  if (!confirm('この記録を削除しますか？')) return;
+  const { error } = await sb.from('entries').delete().eq('id', id);
+  if (error) { showToast('エラー: ' + error.message); return; }
+  showToast('削除しました');
+  renderAdminEntries();
 }
 
 sb.auth.onAuthStateChange((event, session) => {
