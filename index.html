@@ -175,8 +175,21 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
       </div>
       <div class="header-title">送迎くん</div>
     </div>
-    <button class="user-badge" id="user-badge-label">— 設定</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="group-switcher-btn" onclick="toggleGroupMenu()" style="font-size:12px;color:#666;background:#f5f5f5;padding:5px 10px;border-radius:999px;cursor:pointer;border:1px solid #e8e8e8;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">— ▾</button>
+      <button class="user-badge" id="user-badge-label">設定</button>
+    </div>
   </div>
+
+  <!-- グループ切り替えメニュー -->
+  <div id="group-menu" style="display:none;position:fixed;top:53px;right:16px;background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,0.12);z-index:50;min-width:220px;border:1px solid #f0f0f0;overflow:hidden">
+    <div style="padding:10px 14px;font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #f5f5f5">グループを切り替える</div>
+    <div id="group-menu-list"></div>
+    <div style="border-top:1px solid #f5f5f5">
+      <button onclick="goToGroupSetup()" style="width:100%;padding:12px 14px;text-align:left;font-size:13px;color:#1a1a1a;background:none;border:none;cursor:pointer;font-weight:600">＋ 新しいグループに参加・作成</button>
+    </div>
+  </div>
+  <div id="group-menu-overlay" style="display:none;position:fixed;inset:0;z-index:49" onclick="toggleGroupMenu()"></div>
   <div class="tabs">
     <button class="tab active" onclick="showTab('log')">記録</button>
     <button class="tab" onclick="showTab('summary')">集計</button>
@@ -641,6 +654,7 @@ let currentUser = null;
 let currentPair = null;
 let myMember = null;
 let currentPeriod = 'month';
+let allMyGroups = [];
 
 function lsGet() { try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch(e) { return {}; } }
 function lsSet(d) { localStorage.setItem(LS, JSON.stringify(d)); }
@@ -711,12 +725,13 @@ async function init() {
 
   const { data: members } = await sb.from('pair_members')
     .select('*, pairs(*)')
-    .eq('user_id', currentUser.id)
-    .limit(1);
+    .eq('user_id', currentUser.id);
 
   if (members && members.length > 0) {
+    // 複数グループに所属している場合、最初のグループをデフォルトに
     myMember = members[0];
     currentPair = members[0].pairs;
+    allMyGroups = members.map(m => ({ member: m, pair: m.pairs }));
     enterMain();
   } else {
     showScreen('pair');
@@ -746,6 +761,10 @@ async function createPair() {
   currentPair = pair;
   const { data: member } = await sb.from('pair_members').select('*').eq('user_id', currentUser.id).eq('pair_id', pair.id).single();
   myMember = member;
+  // allMyGroupsに追加
+  if (!allMyGroups.find(g => g.pair?.id === pair.id)) {
+    allMyGroups.push({ member, pair });
+  }
 
   document.getElementById('invite-code-display').textContent = code;
   showScreen('invite');
@@ -768,6 +787,10 @@ async function joinPair() {
   currentPair = pair;
   const { data: member } = await sb.from('pair_members').select('*').eq('user_id', currentUser.id).eq('pair_id', pair.id).single();
   myMember = member;
+  // allMyGroupsに追加
+  if (!allMyGroups.find(g => g.pair?.id === pair.id)) {
+    allMyGroups.push({ member, pair });
+  }
   enterMain();
 }
 
@@ -775,6 +798,9 @@ function goToMain() { enterMain(); }
 
 function enterMain() {
   document.getElementById('user-badge-label').textContent = (myMember?.display_name || '') + ' 設定';
+  // グループ切り替えボタン更新
+  const btn = document.getElementById('group-switcher-btn');
+  if (btn) btn.textContent = (currentPair?.name || '—') + ' ▾';
   const s = getSettings();
   document.getElementById('set-price').value = s.price;
   document.getElementById('set-fuel').value = s.fuel;
@@ -786,15 +812,60 @@ function enterMain() {
     renderPassengerList(members);
   });
   refreshPlaceSelects();
-  // 管理者判定：グループ作成者 or サービス管理者
+  // 管理者判定
   const isGroupAdmin = currentPair?.admin_user_id === currentUser?.id;
   const isServiceAdmin = currentUser?.email === ADMIN_EMAIL;
+  // 管理者カードをリセット
+  document.getElementById('tab-admin-btn').style.display = 'none';
+  document.getElementById('group-admin-card').style.display = 'none';
+  document.getElementById('fuel-settings-card').style.display = 'none';
   if (isGroupAdmin || isServiceAdmin) {
     document.getElementById('tab-admin-btn').style.display = 'flex';
     document.getElementById('group-admin-card').style.display = 'block';
     document.getElementById('fuel-settings-card').style.display = 'block';
   }
   showScreen('main');
+}
+
+function toggleGroupMenu() {
+  const menu = document.getElementById('group-menu');
+  const overlay = document.getElementById('group-menu-overlay');
+  const isOpen = menu.style.display !== 'none';
+  if (!isOpen) {
+    renderGroupMenu();
+    menu.style.display = 'block';
+    overlay.style.display = 'block';
+  } else {
+    menu.style.display = 'none';
+    overlay.style.display = 'none';
+  }
+}
+
+function renderGroupMenu() {
+  const list = document.getElementById('group-menu-list');
+  list.innerHTML = allMyGroups.map(g => {
+    const isActive = g.pair?.id === currentPair?.id;
+    return `<button onclick="switchGroup('${g.pair?.id}')" style="width:100%;padding:12px 14px;text-align:left;font-size:13px;background:${isActive ? '#f5f5f5' : 'none'};border:none;cursor:pointer;display:flex;align-items:center;gap:8px">
+      <span style="flex:1;font-weight:${isActive ? '700' : '500'}">${g.pair?.name || '—'}</span>
+      ${isActive ? '<span style="font-size:10px;color:#aaa">現在</span>' : ''}
+    </button>`;
+  }).join('');
+}
+
+async function switchGroup(pairId) {
+  toggleGroupMenu();
+  const group = allMyGroups.find(g => g.pair?.id === pairId);
+  if (!group) return;
+  currentPair = group.pair;
+  myMember = group.member;
+  showToast(`${currentPair.name} に切り替えました`);
+  enterMain();
+  showTab('log');
+}
+
+function goToGroupSetup() {
+  toggleGroupMenu();
+  showScreen('pair');
 }
 
 function renderDriverSelect(members) {
