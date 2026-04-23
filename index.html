@@ -497,9 +497,8 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
           </div>
         </div>
         <div style="background:#fafafa;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#555;line-height:1.7;border:1px solid #f0f0f0">
-          送迎費用を2家庭間で記録・折半するアプリです。メールアドレスで登録して、招待コードでグループに参加して使います。
+          複数の家族間で送迎費用を記録・折半するアプリです。3家族以上にも対応。グループ作成者が管理者として会場登録やガソリン設定を管理します。
         </div>
-
         <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
           <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">はじめかた</div>
           <div style="display:flex;flex-direction:column;gap:10px">
@@ -509,71 +508,97 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">2</div>
-              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">グループを作成する</div><div style="font-size:12px;color:#999">「新しいグループを作る」で表示名（例：髙井家）とグループ名を入力して作成。6桁の招待コードが発行されます</div></div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">グループを作成する（最初の1人）</div><div style="font-size:12px;color:#999">「新しいグループを作る」で家族名・表示名・グループ名を入力して作成。グループ作成者が管理者になります</div></div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">3</div>
-              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">招待コードを相手に送る</div><div style="font-size:12px;color:#999">6桁のコードをLINEなどで相手に共有。相手も同じアプリでアカウント登録後、コードを入力して参加</div></div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">招待コードを他の家族に送る</div><div style="font-size:12px;color:#999">6桁のコードをLINEで共有。参加したい家族は新規登録後にコードを入力。パパ・ママそれぞれ登録してOK</div></div>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div style="width:24px;height:24px;background:#1a1a1a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">4</div>
-              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">準備完了！記録を始める</div><div style="font-size:12px;color:#999">グループが作成されたら送迎の記録ができます。複数人が同じ招待コードで参加もOKです</div></div>
+              <div><div style="font-size:13px;font-weight:700;margin-bottom:2px">準備完了！記録を始める</div><div style="font-size:12px;color:#999">全員が参加したら記録できます。3家族以上でも同じ招待コードで参加できます</div></div>
             </div>
           </div>
         </div>
-
         <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
           <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">送迎を記録する</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="border-left:2px solid #1a1a1a;padding-left:10px">
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">種別を選ぶ</div>
+              <div style="font-size:11px;color:#999">「片道」「往復（同じルート）」「往復（行き帰り別）」の3種類。行き帰りで乗る家族やルートが違う場合は「往復（行き帰り別）」を選ぶと1回で記録できます</div>
+            </div>
+            <div style="border-left:2px solid #1a1a1a;padding-left:10px">
               <div style="font-size:12px;font-weight:700;margin-bottom:2px">出発地・到着地を選ぶ</div>
-              <div style="font-size:11px;color:#999">プルダウンから選ぶとGoogle Mapsのルート確認ボタンが出ます</div>
+              <div style="font-size:11px;color:#999">プルダウンから選ぶとGoogle Mapsボタンが表示されます。設定タブで自宅住所を登録するとプルダウンに追加されます</div>
             </div>
             <div style="border-left:2px solid #1a1a1a;padding-left:10px">
-              <div style="font-size:12px;font-weight:700;margin-bottom:2px">Google Mapsで距離を確認して入力</div>
-              <div style="font-size:11px;color:#999">ボタンをタップ→地図アプリで表示された距離（km）を入力</div>
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">運転した人・乗せた人を選ぶ</div>
+              <div style="font-size:11px;color:#999">家族名単位で選択。乗せた家族数で費用が等分されます（例：2家族乗車なら2等分・3家族なら3等分）</div>
             </div>
             <div style="border-left:2px solid #1a1a1a;padding-left:10px">
-              <div style="font-size:12px;font-weight:700;margin-bottom:2px">片道 / 往復を選ぶ</div>
-              <div style="font-size:11px;color:#999">往復を選ぶと距離・高速代が自動で2倍になります</div>
-            </div>
-            <div style="border-left:2px solid #1a1a1a;padding-left:10px">
-              <div style="font-size:12px;font-weight:700;margin-bottom:2px">「記録する」をタップ</div>
-              <div style="font-size:11px;color:#999">「記録しました」と出たら保存完了！相手にもすぐ反映されます</div>
+              <div style="font-size:12px;font-weight:700;margin-bottom:2px">距離・高速代を入力して記録</div>
+              <div style="font-size:11px;color:#999">Google Mapsで確認した距離を入力。プレビューで1家族あたりの金額を確認できます</div>
             </div>
           </div>
         </div>
-
         <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
           <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">集計の見方</div>
-          <div style="background:#f1f8e9;border-radius:10px;padding:12px;font-size:12px;color:#444;line-height:1.7;border-left:3px solid #66bb6a">
-            「A → Bへ ○○円 お支払い（折半）」と表示された場合、AがBへその金額を支払います。今週・今月・全期間・期間指定で絞り込めます。
+          <div style="background:#f1f8e9;border-radius:10px;padding:12px;font-size:12px;color:#444;line-height:1.7;border-left:3px solid #66bb6a;margin-bottom:8px">
+            各家族の収支が表示されます。「A → Bへ ○○円 お支払い」と表示された場合、AがBへその金額を支払います。今週・今月・全期間・期間指定で絞り込めます。
+          </div>
+          <div style="background:#fafafa;border-radius:10px;padding:10px 12px;font-size:12px;color:#555;border:1px solid #f0f0f0">
+            ガソリン代は管理者が設定したガソリン単価・燃費をもとに自動計算されます。
           </div>
         </div>
-
+        <div style="border-top:1px solid #f5f5f5;padding-top:14px;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">設定でできること</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">自宅住所を登録</div>
+              <div style="font-size:11px;color:#999">登録するとプルダウンに家族名で自宅が表示されます。同じ家族名のメンバーは住所を共有します</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">表示名の変更</div>
+              <div style="font-size:11px;color:#999">いつでも変更できます</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">管理者：会場の追加・削除</div>
+              <div style="font-size:11px;color:#999">よく使う試合会場を登録するとプルダウンに表示されます</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">管理者：ガソリン単価・燃費</div>
+              <div style="font-size:11px;color:#999">グループ全体のガソリン計算に使われます。定期的に見直してください</div>
+            </div>
+          </div>
+        </div>
         <div style="border-top:1px solid #f5f5f5;padding-top:14px">
           <div style="font-size:13px;font-weight:800;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px">よくある質問</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
-              <div style="font-size:12px;font-weight:700;margin-bottom:3px">履歴に表示されない</div>
-              <div style="font-size:11px;color:#999">「更新」ボタンをタップしてください。</div>
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">3家族以上でも使えますか？</div>
+              <div style="font-size:11px;color:#999">使えます！同じ招待コードで何家族でも参加できます。費用は乗せた家族数で自動的に等分されます</div>
+            </div>
+            <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">パパとママで別々に登録できますか？</div>
+              <div style="font-size:11px;color:#999">できます！同じ家族名を選んで参加すれば、集計は家族単位でまとめられます</div>
             </div>
             <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
               <div style="font-size:12px;font-weight:700;margin-bottom:3px">招待コードを忘れた</div>
-              <div style="font-size:11px;color:#999">「設定」タブの「グループ情報」から確認できます。</div>
+              <div style="font-size:11px;color:#999">「設定」タブの「グループ情報」から確認できます</div>
             </div>
             <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
               <div style="font-size:12px;font-weight:700;margin-bottom:3px">誤って記録した</div>
-              <div style="font-size:11px;color:#999">「履歴」タブで自分が登録した記録の「削除」をタップしてください。</div>
+              <div style="font-size:11px;color:#999">「履歴」タブで自分が登録した記録の「削除」をタップしてください</div>
             </div>
             <div style="background:#fafafa;border-radius:10px;padding:10px 12px;border:1px solid #f0f0f0">
-              <div style="font-size:12px;font-weight:700;margin-bottom:3px">複数人で使いたい</div>
-              <div style="font-size:11px;color:#999">同じ招待コードで複数人が参加できます。それぞれがアカウント登録してコードを入力してください。</div>
+              <div style="font-size:12px;font-weight:700;margin-bottom:3px">ホーム画面に追加したい</div>
+              <div style="font-size:11px;color:#999">iPhoneはSafariで「共有」→「ホーム画面に追加」、Androidはブラウザメニューから「ホーム画面に追加」でアプリのように使えます</div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
 
     <!-- 管理タブ -->
     <div id="tab-admin" style="display:none">
@@ -876,7 +901,15 @@ async function updateProfile() {
     myMember.display_name = newName;
     document.getElementById('user-badge-label').textContent = newName + ' 設定';
   }
-  if (newAddr) myMember.address = newAddr;
+  if (newAddr) {
+    // 同じfamily_nameのメンバー全員の住所を更新
+    const myFamily = myMember.family_name || myMember.display_name;
+    await sb.from('pair_members')
+      .update({ address: newAddr })
+      .eq('pair_id', currentPair.id)
+      .eq('family_name', myFamily);
+    myMember.address = newAddr;
+  }
   document.getElementById('new-display-name').value = '';
   document.getElementById('new-address').value = '';
   renderPairInfo();
@@ -920,10 +953,16 @@ async function refreshPlaceSelects() {
   const members = await loadMembers();
   const { data: venues } = await sb.from('venues').select('*').eq('pair_id', currentPair.id).order('name');
 
-  // 自宅オプション（addressが登録されているメンバー）
-  const homeOptions = members
-    .filter(m => m.address)
-    .map(m => `<option value="${m.display_name}" data-addr="${m.address}">${m.family_name || m.display_name}の自宅</option>`)
+  // 自宅オプション（family_name単位で重複排除）
+  const familyAddresses = {};
+  members.forEach(m => {
+    if (m.address) {
+      const fname = m.family_name || m.display_name;
+      if (!familyAddresses[fname]) familyAddresses[fname] = m.address;
+    }
+  });
+  const homeOptions = Object.entries(familyAddresses)
+    .map(([fname, addr]) => `<option value="${fname}" data-addr="${addr}">${fname}</option>`)
     .join('');
 
   // 会場オプション
