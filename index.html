@@ -190,115 +190,215 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
     <!-- 記録タブ -->
     <div id="tab-log">
       <div class="card">
-        <div class="sec-title">出発地・到着地</div>
-        <div class="row">
-          <div class="field">
-            <div class="label">出発地</div>
-            <select id="sel-from" onchange="onFromChange()">
-              <option value="">— 選択 —</option>
-              <optgroup label="自宅・駅">
-                <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
-                <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
-                <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
-                <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-                <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
-              </optgroup>
-              <optgroup label="試合・練習会場">
-                <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-                <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-                <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-                <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-                <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-                <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-                <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-                <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-                <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-                <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
-              </optgroup>
-              <option value="__free__">その他（自由入力）</option>
-            </select>
-          </div>
-        </div>
-        <div id="from-free-wrap" style="display:none" class="row">
-          <div class="field"><input type="text" id="from-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <div class="label">到着地</div>
-            <select id="sel-to" onchange="onToChange()">
-              <option value="">— 選択 —</option>
-              <optgroup label="自宅・駅">
-                <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
-                <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
-                <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
-                <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-                <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
-              </optgroup>
-              <optgroup label="試合・練習会場">
-                <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-                <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-                <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-                <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-                <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-                <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-                <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-                <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-                <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-                <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
-              </optgroup>
-              <option value="__free__">その他（自由入力）</option>
-            </select>
-          </div>
-        </div>
-        <div id="to-free-wrap" style="display:none" class="row">
-          <div class="field"><input type="text" id="to-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
-        </div>
-        <div id="maps-area" style="display:none">
-          <div class="maps-box">
-            <a id="maps-link" href="#" target="_blank">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              Google Maps でルート確認
-            </a>
-            <div class="maps-hint">表示された距離（km）を下の欄に入力してください</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
         <div class="sec-title">送迎を記録</div>
+
+        <!-- 日付・モード選択 -->
         <div class="row">
           <div class="field"><div class="label">日付</div><input type="date" id="inp-date"></div>
-        </div>
-        <div class="row">
           <div class="field">
-            <div class="label">運転した人</div>
-            <select id="inp-driver" onchange="updatePassengerList()">
-              <option value="">— 選択 —</option>
+            <div class="label">種別</div>
+            <select id="inp-trip-mode" onchange="onTripModeChange()">
+              <option value="one">片道</option>
+              <option value="same">往復（同じルート）</option>
+              <option value="diff">往復（行き帰り別）</option>
             </select>
           </div>
         </div>
-        <div class="field" style="margin-bottom:10px">
-          <div class="label" style="margin-bottom:6px">乗せた人（複数選択可）</div>
-          <div id="passenger-list" style="display:flex;flex-direction:column;gap:6px"></div>
-        </div>
-        <div class="row">
-          <div class="field"><div class="label">メモ</div><input type="text" id="inp-note" placeholder="例：髙井家 → コザしんきんドーム"></div>
-        </div>
-        <div class="row">
-          <div class="field"><div class="label">片道 / 往復</div>
-            <select id="inp-trip" onchange="updatePreview()">
-              <option value="1">片道</option>
-              <option value="2">往復（×2）</option>
-            </select>
+
+        <!-- 行き -->
+        <div style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
+          <div id="leg-go-label" style="font-size:11px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">行き</div>
+          <div class="row">
+            <div class="field">
+              <div class="label">出発地</div>
+              <select id="sel-from" onchange="onFromChange()">
+                <option value="">— 選択 —</option>
+                <optgroup label="自宅・駅">
+                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
+                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
+                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
+                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
+                </optgroup>
+                <optgroup label="試合・練習会場">
+                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
+                </optgroup>
+                <option value="__free__">その他（自由入力）</option>
+              </select>
+            </div>
           </div>
-          <div class="field"><div class="label">片道距離 (km)</div><input type="number" id="inp-km" placeholder="0" min="0" step="0.1" oninput="updatePreview()"></div>
+          <div id="from-free-wrap" style="display:none" class="row">
+            <div class="field"><input type="text" id="from-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <div class="label">到着地</div>
+              <select id="sel-to" onchange="onToChange()">
+                <option value="">— 選択 —</option>
+                <optgroup label="自宅・駅">
+                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
+                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
+                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
+                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
+                </optgroup>
+                <optgroup label="試合・練習会場">
+                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
+                </optgroup>
+                <option value="__free__">その他（自由入力）</option>
+              </select>
+            </div>
+          </div>
+          <div id="to-free-wrap" style="display:none" class="row">
+            <div class="field"><input type="text" id="to-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
+          </div>
+          <div id="maps-area" style="display:none">
+            <div class="maps-box">
+              <a id="maps-link" href="#" target="_blank">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Google Maps でルート確認
+              </a>
+              <div class="maps-hint">表示された距離（km）を下の欄に入力してください</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <div class="label">運転した人</div>
+              <select id="inp-driver" onchange="updatePassengerList()">
+                <option value="">— 選択 —</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">乗せた人（複数選択可）</div>
+            <div id="passenger-list" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">距離 (km)</div><input type="number" id="inp-km" placeholder="0" min="0" step="0.1" oninput="updatePreview()"></div>
+            <div class="field"><div class="label">高速代 (円)</div><input type="number" id="inp-toll" placeholder="0" min="0" oninput="updatePreview()"></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">その他 (円)</div><input type="number" id="inp-other" placeholder="0" min="0" oninput="updatePreview()"></div>
+            <div class="field"><div class="label">メモ</div><input type="text" id="inp-note" placeholder="例：コザしんきんドームへ"></div>
+          </div>
         </div>
-        <div class="row">
-          <div class="field"><div class="label">高速代 (円)</div><input type="number" id="inp-toll" placeholder="0" min="0" oninput="updatePreview()"></div>
-          <div class="field"><div class="label">その他 (円)</div><input type="number" id="inp-other" placeholder="0" min="0" oninput="updatePreview()"></div>
+
+        <!-- 帰り（往復行き帰り別の時のみ表示） -->
+        <div id="leg-return-wrap" style="display:none;border-top:2px dashed #e8e8e8;padding-top:12px;margin-top:8px">
+          <div style="font-size:11px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">帰り</div>
+          <div class="row">
+            <div class="field">
+              <div class="label">出発地</div>
+              <select id="sel-from-r" onchange="onFromChangeR()">
+                <option value="">— 選択 —</option>
+                <optgroup label="自宅・駅">
+                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
+                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
+                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
+                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
+                </optgroup>
+                <optgroup label="試合・練習会場">
+                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
+                </optgroup>
+                <option value="__free__">その他（自由入力）</option>
+              </select>
+            </div>
+          </div>
+          <div id="from-free-wrap-r" style="display:none" class="row">
+            <div class="field"><input type="text" id="from-free-r" placeholder="場所名または住所" oninput="updateMapsLinkR()"></div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <div class="label">到着地</div>
+              <select id="sel-to-r" onchange="onToChangeR()">
+                <option value="">— 選択 —</option>
+                <optgroup label="自宅・駅">
+                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
+                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
+                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
+                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
+                </optgroup>
+                <optgroup label="試合・練習会場">
+                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
+                </optgroup>
+                <option value="__free__">その他（自由入力）</option>
+              </select>
+            </div>
+          </div>
+          <div id="to-free-wrap-r" style="display:none" class="row">
+            <div class="field"><input type="text" id="to-free-r" placeholder="場所名または住所" oninput="updateMapsLinkR()"></div>
+          </div>
+          <div id="maps-area-r" style="display:none">
+            <div class="maps-box">
+              <a id="maps-link-r" href="#" target="_blank">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Google Maps でルート確認（帰り）
+              </a>
+              <div class="maps-hint">表示された距離（km）を入力してください</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <div class="label">運転した人（帰り）</div>
+              <select id="inp-driver-r">
+                <option value="">— 選択 —</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">乗せた人（帰り・複数選択可）</div>
+            <div id="passenger-list-r" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">距離 (km)</div><input type="number" id="inp-km-r" placeholder="0" min="0" step="0.1" oninput="updatePreview()"></div>
+            <div class="field"><div class="label">高速代 (円)</div><input type="number" id="inp-toll-r" placeholder="0" min="0" oninput="updatePreview()"></div>
+          </div>
+          <div class="row">
+            <div class="field"><div class="label">その他 (円)</div><input type="number" id="inp-other-r" placeholder="0" min="0" oninput="updatePreview()"></div>
+            <div class="field"><div class="label">メモ</div><input type="text" id="inp-note-r" placeholder="例：帰りは新垣家も"></div>
+          </div>
         </div>
-        <div class="preview" id="preview-cost"></div>
-        <button class="primary" onclick="addEntry()">記録する</button>
+
+        <div class="preview" id="preview-cost" style="margin-top:10px"></div>
+        <button class="primary" onclick="addEntry()" style="margin-top:4px">記録する</button>
       </div>
     </div>
 
@@ -354,8 +454,8 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         <input type="text" id="new-pair-name" placeholder="例：さくらチーム送迎" style="margin-bottom:10px">
         <button class="secondary" onclick="updatePairName()" style="width:100%">変更する</button>
       </div>
-      <div class="card">
-        <div class="sec-title">計算設定</div>
+      <div class="card" id="fuel-settings-card" style="display:none">
+        <div class="sec-title">計算設定（管理者）</div>
         <div class="setting-row">
           <span>ガソリン単価（円/L）</span>
           <input type="number" id="set-price" style="width:80px;text-align:right" value="175" min="100" max="300" oninput="updateUnitCost()">
@@ -651,18 +751,20 @@ function enterMain() {
     renderDriverSelect(members);
     renderPassengerList(members);
   });
-  // 管理者タブ・グループ名変更カード表示
+  // 管理者タブ・グループ名変更カード・燃費設定表示
   if (currentUser?.email === ADMIN_EMAIL) {
     document.getElementById('tab-admin-btn').style.display = 'flex';
     document.getElementById('group-name-card').style.display = 'block';
+    document.getElementById('fuel-settings-card').style.display = 'block';
   }
   showScreen('main');
 }
 
 function renderDriverSelect(members) {
   const sel = document.getElementById('inp-driver');
+  const selR = document.getElementById('inp-driver-r');
   sel.innerHTML = '<option value="">— 選択 —</option>';
-  // 家族名でまとめて重複排除
+  selR.innerHTML = '<option value="">— 選択 —</option>';
   const families = [];
   const seen = new Set();
   members.forEach(m => {
@@ -673,15 +775,39 @@ function renderDriverSelect(members) {
     }
   });
   families.forEach(f => {
-    const opt = document.createElement('option');
-    opt.value = f.user_id;
-    opt.textContent = f.family_name;
-    // 自分の家族名が一致したらデフォルト選択
     const myFamily = myMember?.family_name || myMember?.display_name;
-    if (f.family_name === myFamily) opt.selected = true;
-    sel.appendChild(opt);
+    [sel, selR].forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = f.user_id;
+      opt.textContent = f.family_name;
+      if (f.family_name === myFamily) opt.selected = true;
+      s.appendChild(opt);
+    });
   });
   updatePassengerList();
+  renderPassengerListR(members);
+}
+
+function renderPassengerListR(members) {
+  const driverId = document.getElementById('inp-driver-r').value;
+  const driverMember = members.find(m => m.user_id === driverId);
+  const driverFamily = driverMember ? (driverMember.family_name || driverMember.display_name) : null;
+  const container = document.getElementById('passenger-list-r');
+  const families = [];
+  const seen = new Set();
+  members.forEach(m => {
+    const fname = m.family_name || m.display_name;
+    if (!seen.has(fname) && fname !== driverFamily) {
+      seen.add(fname);
+      families.push({ user_id: m.user_id, family_name: fname });
+    }
+  });
+  container.innerHTML = families.map(f => `
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fafafa;border-radius:10px;border:1.5px solid #ececec;cursor:pointer">
+      <input type="checkbox" name="passenger-r" value="${f.user_id}" style="width:18px;height:18px;accent-color:#1a1a1a;cursor:pointer" onchange="updatePreview()">
+      <span style="font-size:13px;font-weight:500">${f.family_name}</span>
+    </label>
+  `).join('');
 }
 
 function updatePassengerList() {
@@ -767,6 +893,33 @@ function onToChange() {
   document.getElementById('to-free-wrap').style.display = document.getElementById('sel-to').value === '__free__' ? 'flex' : 'none';
   updateMapsLink();
 }
+
+function onTripModeChange() {
+  const mode = document.getElementById('inp-trip-mode').value;
+  const returnWrap = document.getElementById('leg-return-wrap');
+  const goLabel = document.getElementById('leg-go-label');
+  returnWrap.style.display = mode === 'diff' ? 'block' : 'none';
+  goLabel.style.display = mode === 'diff' ? 'block' : 'none';
+  updatePreview();
+}
+
+function onFromChangeR() {
+  document.getElementById('from-free-wrap-r').style.display = document.getElementById('sel-from-r').value === '__free__' ? 'flex' : 'none';
+  updateMapsLinkR();
+}
+function onToChangeR() {
+  document.getElementById('to-free-wrap-r').style.display = document.getElementById('sel-to-r').value === '__free__' ? 'flex' : 'none';
+  updateMapsLinkR();
+}
+function updateMapsLinkR() {
+  const fa = getSelectedAddr('sel-from-r', 'from-free-r');
+  const ta = getSelectedAddr('sel-to-r', 'to-free-r');
+  const area = document.getElementById('maps-area-r');
+  if (fa && ta) {
+    document.getElementById('maps-link-r').href = 'https://www.google.com/maps/dir/' + encodeURIComponent(fa) + '/' + encodeURIComponent(ta) + '/?hl=ja&dirflg=d';
+    area.style.display = 'block';
+  } else { area.style.display = 'none'; }
+}
 function updateMapsLink() {
   const fa = getSelectedAddr('sel-from', 'from-free');
   const ta = getSelectedAddr('sel-to', 'to-free');
@@ -784,66 +937,125 @@ function autoFillNote() {
 }
 function updatePreview() {
   const s = getSettings();
+  const mode = document.getElementById('inp-trip-mode').value;
   const km = parseFloat(document.getElementById('inp-km').value) || 0;
-  const trip = parseInt(document.getElementById('inp-trip').value) || 1;
-  const totalKm = km * trip;
   const toll = parseFloat(document.getElementById('inp-toll').value) || 0;
-  const totalToll = toll * trip;
   const other = parseFloat(document.getElementById('inp-other').value) || 0;
-  const totalCost = calcGas(totalKm, s) + totalToll + other;
   const checkedCount = document.querySelectorAll('input[name="passenger"]:checked').length;
   const splitCount = checkedCount + 1;
-  const perFamily = splitCount > 1 ? Math.round(totalCost / splitCount) : 0;
-  document.getElementById('preview-cost').textContent =
-    (km > 0 || toll > 0 || other > 0)
-      ? `合計 ${fmt(totalCost)}　${splitCount > 1 ? `÷${splitCount}家族 = 1家族あたり ${fmt(perFamily)}` : '（乗せた人を選んでください）'}`
-      : '';
+
+  if (mode === 'same') {
+    const totalKm = km * 2;
+    const totalToll = toll * 2;
+    const totalCost = calcGas(totalKm, s) + totalToll + other;
+    const perFamily = splitCount > 1 ? Math.round(totalCost / splitCount) : 0;
+    document.getElementById('preview-cost').textContent =
+      km > 0 ? `往復${totalKm}km　合計 ${fmt(totalCost)}　${splitCount > 1 ? `÷${splitCount}家族 = 1家族あたり ${fmt(perFamily)}` : '（乗せた人を選んでください）'}` : '';
+  } else if (mode === 'diff') {
+    const kmR = parseFloat(document.getElementById('inp-km-r').value) || 0;
+    const tollR = parseFloat(document.getElementById('inp-toll-r').value) || 0;
+    const otherR = parseFloat(document.getElementById('inp-other-r').value) || 0;
+    const checkedCountR = document.querySelectorAll('input[name="passenger-r"]:checked').length;
+    const splitCountR = checkedCountR + 1;
+    const costGo = calcGas(km, s) + toll + other;
+    const costReturn = calcGas(kmR, s) + tollR + otherR;
+    const perGo = splitCount > 1 ? Math.round(costGo / splitCount) : 0;
+    const perReturn = splitCountR > 1 ? Math.round(costReturn / splitCountR) : 0;
+    document.getElementById('preview-cost').textContent =
+      (km > 0 || kmR > 0) ? `行き ${fmt(costGo)}（÷${splitCount}=${fmt(perGo)}）　帰り ${fmt(costReturn)}（÷${splitCountR}=${fmt(perReturn)}）` : '';
+  } else {
+    const totalCost = calcGas(km, s) + toll + other;
+    const perFamily = splitCount > 1 ? Math.round(totalCost / splitCount) : 0;
+    document.getElementById('preview-cost').textContent =
+      km > 0 ? `${km}km　合計 ${fmt(totalCost)}　${splitCount > 1 ? `÷${splitCount}家族 = 1家族あたり ${fmt(perFamily)}` : '（乗せた人を選んでください）'}` : '';
+  }
 }
 
 async function addEntry() {
   if (!currentPair) { showToast('グループが設定されていません'); return; }
   const date = document.getElementById('inp-date').value;
   if (!date) { showToast('日付を入力してください'); return; }
+  const mode = document.getElementById('inp-trip-mode').value;
   const driverId = document.getElementById('inp-driver').value;
   if (!driverId) { showToast('運転した人を選んでください'); return; }
   const passengerIds = Array.from(document.querySelectorAll('input[name="passenger"]:checked')).map(cb => cb.value);
   if (passengerIds.length === 0) { showToast('乗せた人を選んでください'); return; }
 
-  const kmRaw = parseFloat(document.getElementById('inp-km').value) || 0;
-  const trip = parseInt(document.getElementById('inp-trip').value) || 1;
+  const km = parseFloat(document.getElementById('inp-km').value) || 0;
   const toll = parseFloat(document.getElementById('inp-toll').value) || 0;
-  const splitCount = passengerIds.length + 1;
+  const other = parseFloat(document.getElementById('inp-other').value) || 0;
+  const note = document.getElementById('inp-note').value.trim();
+  const fromPlace = getSelectedName('sel-from', 'from-free');
+  const toPlace = getSelectedName('sel-to', 'to-free');
 
-  const entry = {
-    pair_id: currentPair.id,
-    user_id: currentUser.id,
-    driver_id: driverId,
-    passengers: passengerIds,
-    date,
-    dir: driverId === currentUser.id ? 'send' : 'recv',
-    note: document.getElementById('inp-note').value.trim(),
-    from_place: getSelectedName('sel-from', 'from-free'),
-    to_place: getSelectedName('sel-to', 'to-free'),
-    km: Math.round(kmRaw * trip * 10) / 10,
-    toll: Math.round(toll * trip),
-    other: parseFloat(document.getElementById('inp-other').value) || 0,
-    trip,
-  };
   const btn = document.querySelector('#tab-log button.primary');
   btn.textContent = '保存中...'; btn.disabled = true;
-  const { error } = await sb.from('entries').insert(entry);
+
+  const entries = [];
+
+  if (mode === 'same') {
+    entries.push({
+      pair_id: currentPair.id, user_id: currentUser.id,
+      driver_id: driverId, passengers: passengerIds,
+      date, dir: driverId === currentUser.id ? 'send' : 'recv',
+      note: note || `${fromPlace}→${toPlace}（往復）`,
+      from_place: fromPlace, to_place: toPlace,
+      km: Math.round(km * 2 * 10) / 10,
+      toll: Math.round(toll * 2), other, trip: 2,
+    });
+  } else if (mode === 'diff') {
+    const driverIdR = document.getElementById('inp-driver-r').value;
+    const passengerIdsR = Array.from(document.querySelectorAll('input[name="passenger-r"]:checked')).map(cb => cb.value);
+    if (!driverIdR) { showToast('帰りの運転した人を選んでください'); btn.textContent = '記録する'; btn.disabled = false; return; }
+    if (passengerIdsR.length === 0) { showToast('帰りの乗せた人を選んでください'); btn.textContent = '記録する'; btn.disabled = false; return; }
+    const kmR = parseFloat(document.getElementById('inp-km-r').value) || 0;
+    const tollR = parseFloat(document.getElementById('inp-toll-r').value) || 0;
+    const otherR = parseFloat(document.getElementById('inp-other-r').value) || 0;
+    const noteR = document.getElementById('inp-note-r').value.trim();
+    const fromPlaceR = getSelectedName('sel-from-r', 'from-free-r');
+    const toPlaceR = getSelectedName('sel-to-r', 'to-free-r');
+    entries.push({
+      pair_id: currentPair.id, user_id: currentUser.id,
+      driver_id: driverId, passengers: passengerIds,
+      date, dir: driverId === currentUser.id ? 'send' : 'recv',
+      note: note || `${fromPlace}→${toPlace}`,
+      from_place: fromPlace, to_place: toPlace,
+      km, toll, other, trip: 1,
+    });
+    entries.push({
+      pair_id: currentPair.id, user_id: currentUser.id,
+      driver_id: driverIdR, passengers: passengerIdsR,
+      date, dir: driverIdR === currentUser.id ? 'send' : 'recv',
+      note: noteR || `${fromPlaceR}→${toPlaceR}（帰り）`,
+      from_place: fromPlaceR, to_place: toPlaceR,
+      km: kmR, toll: tollR, other: otherR, trip: 1,
+    });
+  } else {
+    entries.push({
+      pair_id: currentPair.id, user_id: currentUser.id,
+      driver_id: driverId, passengers: passengerIds,
+      date, dir: driverId === currentUser.id ? 'send' : 'recv',
+      note: note || `${fromPlace}→${toPlace}`,
+      from_place: fromPlace, to_place: toPlace,
+      km, toll, other, trip: 1,
+    });
+  }
+
+  const { error } = await sb.from('entries').insert(entries);
   if (error) { showToast('保存失敗: ' + error.message); }
   else {
-    ['inp-km','inp-toll','inp-other','inp-note'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('sel-from').value = '';
-    document.getElementById('sel-to').value = '';
-    document.getElementById('from-free-wrap').style.display = 'none';
-    document.getElementById('to-free-wrap').style.display = 'none';
-    document.getElementById('maps-area').style.display = 'none';
-    document.getElementById('inp-trip').value = '1';
-    document.querySelectorAll('input[name="passenger"]').forEach(cb => cb.checked = false);
+    ['inp-km','inp-toll','inp-other','inp-note','inp-km-r','inp-toll-r','inp-other-r','inp-note-r'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    ['sel-from','sel-to','sel-from-r','sel-to-r'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    ['from-free-wrap','to-free-wrap','from-free-wrap-r','to-free-wrap-r','maps-area','maps-area-r'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    document.querySelectorAll('input[name="passenger"], input[name="passenger-r"]').forEach(cb => cb.checked = false);
     updatePreview();
-    showToast('記録しました');
+    showToast(mode === 'diff' ? '行き・帰り両方記録しました！' : '記録しました！');
   }
   btn.textContent = '記録する'; btn.disabled = false;
 }
