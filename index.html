@@ -443,19 +443,28 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         </div>
       </div>
       <div class="card">
-        <div class="sec-title">表示名を変更</div>
-        <div class="label" style="margin-bottom:4px">新しい表示名</div>
+        <div class="sec-title">自分の情報</div>
+        <div class="label" style="margin-bottom:4px">表示名</div>
         <input type="text" id="new-display-name" placeholder="例：髙井家パパ" style="margin-bottom:10px">
-        <button class="secondary" onclick="updateDisplayName()" style="width:100%">変更する</button>
+        <div class="label" style="margin-bottom:4px">自宅住所（プルダウンに表示されます）</div>
+        <input type="text" id="new-address" placeholder="例：沖縄県那覇市おもろまち2-6-15" style="margin-bottom:10px">
+        <button class="secondary" onclick="updateProfile()" style="width:100%">保存する</button>
       </div>
-      <div class="card" id="group-name-card" style="display:none">
-        <div class="sec-title">グループ名を変更</div>
-        <div class="label" style="margin-bottom:4px">新しいグループ名</div>
+      <div class="card" id="group-admin-card" style="display:none">
+        <div class="sec-title">グループ管理</div>
+        <div class="label" style="margin-bottom:4px">グループ名</div>
         <input type="text" id="new-pair-name" placeholder="例：さくらチーム送迎" style="margin-bottom:10px">
-        <button class="secondary" onclick="updatePairName()" style="width:100%">変更する</button>
+        <button class="secondary" onclick="updatePairName()" style="width:100%;margin-bottom:16px">グループ名を変更</button>
+        <div class="sec-title" style="margin-bottom:8px">会場を追加</div>
+        <div class="label" style="margin-bottom:4px">会場名</div>
+        <input type="text" id="new-venue-name" placeholder="例：コザしんきんドーム" style="margin-bottom:8px">
+        <div class="label" style="margin-bottom:4px">住所</div>
+        <input type="text" id="new-venue-addr" placeholder="例：沖縄県沖縄市諸見里2-1-1" style="margin-bottom:10px">
+        <button class="secondary" onclick="addVenue()" style="width:100%;margin-bottom:12px">会場を追加</button>
+        <div id="venue-list"></div>
       </div>
       <div class="card" id="fuel-settings-card" style="display:none">
-        <div class="sec-title">計算設定（管理者）</div>
+        <div class="sec-title">計算設定</div>
         <div class="setting-row">
           <span>ガソリン単価（円/L）</span>
           <input type="number" id="set-price" style="width:80px;text-align:right" value="175" min="100" max="300" oninput="updateUnitCost()">
@@ -701,7 +710,7 @@ async function createPair() {
 
   const code = generateCode();
   const { data: pair, error: pe } = await sb.from('pairs')
-    .insert({ invite_code: code, name: pairname })
+    .insert({ invite_code: code, name: pairname, admin_user_id: currentUser.id })
     .select().single();
   if (pe) { showToast('エラー: ' + pe.message); return; }
 
@@ -751,10 +760,13 @@ function enterMain() {
     renderDriverSelect(members);
     renderPassengerList(members);
   });
-  // 管理者タブ・グループ名変更カード・燃費設定表示
-  if (currentUser?.email === ADMIN_EMAIL) {
+  refreshPlaceSelects();
+  // 管理者判定：グループ作成者 or サービス管理者
+  const isGroupAdmin = currentPair?.admin_user_id === currentUser?.id;
+  const isServiceAdmin = currentUser?.email === ADMIN_EMAIL;
+  if (isGroupAdmin || isServiceAdmin) {
     document.getElementById('tab-admin-btn').style.display = 'flex';
-    document.getElementById('group-name-card').style.display = 'block';
+    document.getElementById('group-admin-card').style.display = 'block';
     document.getElementById('fuel-settings-card').style.display = 'block';
   }
   showScreen('main');
@@ -848,8 +860,105 @@ function renderPairInfo() {
   `;
 }
 
-async function showInviteCode() {
-  showToast('招待コード: ' + currentPair.invite_code);
+async function updateProfile() {
+  const newName = document.getElementById('new-display-name').value.trim();
+  const newAddr = document.getElementById('new-address').value.trim();
+  if (!newName && !newAddr) { showToast('表示名または住所を入力してください'); return; }
+  const updates = {};
+  if (newName) updates.display_name = newName;
+  if (newAddr) updates.address = newAddr;
+  const { error } = await sb.from('pair_members')
+    .update(updates)
+    .eq('user_id', currentUser.id)
+    .eq('pair_id', currentPair.id);
+  if (error) { showToast('エラー: ' + error.message); return; }
+  if (newName) {
+    myMember.display_name = newName;
+    document.getElementById('user-badge-label').textContent = newName + ' 設定';
+  }
+  if (newAddr) myMember.address = newAddr;
+  document.getElementById('new-display-name').value = '';
+  document.getElementById('new-address').value = '';
+  renderPairInfo();
+  await refreshPlaceSelects();
+  showToast('保存しました！');
+}
+
+async function addVenue() {
+  const name = document.getElementById('new-venue-name').value.trim();
+  const addr = document.getElementById('new-venue-addr').value.trim();
+  if (!name) { showToast('会場名を入力してください'); return; }
+  const { error } = await sb.from('venues').insert({ pair_id: currentPair.id, name, address: addr });
+  if (error) { showToast('エラー: ' + error.message); return; }
+  document.getElementById('new-venue-name').value = '';
+  document.getElementById('new-venue-addr').value = '';
+  showToast('会場を追加しました！');
+  await renderVenueList();
+  await refreshPlaceSelects();
+}
+
+async function renderVenueList() {
+  const { data: venues } = await sb.from('venues').select('*').eq('pair_id', currentPair.id).order('name');
+  const el = document.getElementById('venue-list');
+  if (!venues || !venues.length) { el.innerHTML = '<div style="font-size:12px;color:#aaa;padding:8px 0">会場が登録されていません</div>'; return; }
+  el.innerHTML = venues.map(v => `
+    <div class="setting-row">
+      <div><div style="font-size:13px;font-weight:600">${v.name}</div><div style="font-size:11px;color:#aaa">${v.address || '住所未登録'}</div></div>
+      <button class="danger-sm" onclick="deleteVenue('${v.id}','${v.name}')">削除</button>
+    </div>`).join('');
+}
+
+async function deleteVenue(id, name) {
+  if (!confirm(`「${name}」を削除しますか？`)) return;
+  await sb.from('venues').delete().eq('id', id);
+  showToast('削除しました');
+  await renderVenueList();
+  await refreshPlaceSelects();
+}
+
+async function refreshPlaceSelects() {
+  const members = await loadMembers();
+  const { data: venues } = await sb.from('venues').select('*').eq('pair_id', currentPair.id).order('name');
+
+  // 自宅オプション（addressが登録されているメンバー）
+  const homeOptions = members
+    .filter(m => m.address)
+    .map(m => `<option value="${m.display_name}" data-addr="${m.address}">${m.family_name || m.display_name}の自宅</option>`)
+    .join('');
+
+  // 会場オプション
+  const venueOptions = venues ? venues
+    .map(v => `<option value="${v.name}" data-addr="${v.address || v.name}">${v.name}</option>`)
+    .join('') : '';
+
+  const fixedHomeOptions = `
+    <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
+    <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>`;
+
+  const fixedVenueOptions = `
+    <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
+    <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
+    <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
+    <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
+    <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
+    <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
+    <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
+    <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
+    <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
+    <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>`;
+
+  const fullOptions = `
+    <option value="">— 選択 —</option>
+    ${homeOptions ? `<optgroup label="自宅">${homeOptions}</optgroup>` : ''}
+    <optgroup label="駅">${fixedHomeOptions}</optgroup>
+    ${venueOptions ? `<optgroup label="登録済み会場">${venueOptions}</optgroup>` : ''}
+    <optgroup label="固定会場">${fixedVenueOptions}</optgroup>
+    <option value="__free__">その他（自由入力）</option>`;
+
+  ['sel-from','sel-to','sel-from-r','sel-to-r'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = fullOptions;
+  });
 }
 
 async function updateDisplayName() {
@@ -865,6 +974,10 @@ async function updateDisplayName() {
   document.getElementById('new-display-name').value = '';
   renderPairInfo();
   showToast('表示名を変更しました！');
+}
+
+async function showInviteCode() {
+  showToast('招待コード: ' + currentPair.invite_code);
 }
 
 async function leavePair() {
@@ -1282,7 +1395,7 @@ function showTab(name) {
   });
   if (name === 'summary') renderSummary();
   if (name === 'history') renderHistory();
-  if (name === 'settings') { updateUnitCost(); renderPairInfo(); }
+  if (name === 'settings') { updateUnitCost(); renderPairInfo(); renderVenueList(); }
   if (name === 'admin') renderAdmin();
 }
 
