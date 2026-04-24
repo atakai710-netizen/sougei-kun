@@ -753,7 +753,12 @@ let allMyGroups = [];
 
 function lsGet() { try { return JSON.parse(localStorage.getItem(LS)) || {}; } catch(e) { return {}; } }
 function lsSet(d) { localStorage.setItem(LS, JSON.stringify(d)); }
-function getSettings() { const d = lsGet(); return { price: d.price || 175, fuel: d.fuel || 12 }; }
+function getSettings() {
+  return {
+    price: currentPair?.gas_price || 175,
+    fuel: currentPair?.fuel_efficiency || 12
+  };
+}
 
 function calcGas(km, s) { return km / s.fuel * s.price; }
 function entryTotal(e, s) { return calcGas(e.km || 0, s) + (e.toll || 0) + (e.other || 0); }
@@ -897,8 +902,8 @@ function enterMain() {
   const btn = document.getElementById('group-switcher-btn');
   if (btn) btn.textContent = (currentPair?.name || '—') + ' ▾';
   const s = getSettings();
-  document.getElementById('set-price').value = s.price;
-  document.getElementById('set-fuel').value = s.fuel;
+  document.getElementById('set-price').value = currentPair?.gas_price || 175;
+  document.getElementById('set-fuel').value = currentPair?.fuel_efficiency || 12;
   document.getElementById('inp-date').value = new Date().toISOString().slice(0, 10);
   updateUnitCost(); updatePreview();
   renderPairInfo();
@@ -1546,11 +1551,20 @@ function updateUnitCost() {
   const fuel = parseFloat(document.getElementById('set-fuel').value) || 12;
   document.getElementById('unit-cost').textContent = `約 ${(price / fuel).toFixed(1)} 円/km`;
 }
-function saveSettings() {
-  const d = lsGet();
-  d.price = parseFloat(document.getElementById('set-price').value) || 175;
-  d.fuel = parseFloat(document.getElementById('set-fuel').value) || 12;
-  lsSet(d); updateUnitCost(); showToast('保存しました');
+async function saveSettings() {
+  const price = parseFloat(document.getElementById('set-price').value) || 175;
+  const fuel = parseFloat(document.getElementById('set-fuel').value) || 12;
+  const { error } = await sb.from('pairs')
+    .update({ gas_price: price, fuel_efficiency: fuel })
+    .eq('id', currentPair.id);
+  if (error) { showToast('エラー: ' + error.message); return; }
+  currentPair.gas_price = price;
+  currentPair.fuel_efficiency = fuel;
+  // allMyGroupsも更新
+  const g = allMyGroups.find(g => g.pair?.id === currentPair.id);
+  if (g) { g.pair.gas_price = price; g.pair.fuel_efficiency = fuel; }
+  updateUnitCost();
+  showToast('保存しました！');
 }
 
 function showTab(name) {
