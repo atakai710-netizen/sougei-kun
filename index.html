@@ -32,7 +32,19 @@ button.primary:active{background:#333}
 button.secondary{height:42px;background:#fff;color:#444;border:1.5px solid #e8e8e8;border-radius:10px;padding:0 14px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:500}
 button.small{height:32px;background:#fff;color:#666;border:1px solid #e8e8e8;border-radius:8px;padding:0 12px;font-size:12px;cursor:pointer}
 button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffcdd2;border-radius:6px;padding:0 10px;font-size:12px;cursor:pointer}
-.maps-box{background:#f0f4ff;border-radius:10px;padding:12px;margin:10px 0;border:1px solid #e0e8ff}
+.place-picker{position:relative;width:100%}
+.place-picker-btn{height:42px;border-radius:10px;border:1.5px solid #ececec;background:#fafafa;color:#1a1a1a;padding:0 12px;font-size:13px;width:100%;text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.place-picker-btn.selected{border-color:#1a1a1a;background:#fff;font-weight:600}
+.place-picker-dropdown{display:none;position:absolute;top:46px;left:0;right:0;background:#fff;border-radius:12px;border:1.5px solid #e8e8e8;box-shadow:0 4px 20px rgba(0,0,0,0.1);z-index:30;overflow:hidden;max-height:320px;overflow-y:auto}
+.place-picker-dropdown.open{display:block}
+.place-group-header{padding:8px 12px;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;background:#fafafa;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f5f5f5}
+.place-group-header:hover{background:#f0f0f0}
+.place-group-items{display:none}
+.place-group-items.open{display:block}
+.place-item{padding:10px 16px;font-size:13px;cursor:pointer;border-bottom:1px solid #f8f8f8;color:#1a1a1a}
+.place-item:hover{background:#f5f5f5}
+.place-item:last-child{border-bottom:none}
+.place-item.active{background:#f0f0f0;font-weight:700}
 .maps-box a{display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;color:#fff;padding:8px 14px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600}
 .maps-hint{font-size:12px;color:#666;margin-top:8px}
 .tabs{display:flex;background:#fff;border-bottom:1px solid #f0f0f0;position:sticky;top:55px;z-index:9}
@@ -221,67 +233,13 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         <!-- 行き -->
         <div style="border-top:1px solid #f0f0f0;padding-top:12px;margin-top:4px">
           <div id="leg-go-label" style="font-size:11px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">行き</div>
-          <div class="row">
-            <div class="field">
-              <div class="label">出発地</div>
-              <select id="sel-from" onchange="onFromChange()">
-                <option value="">— 選択 —</option>
-                <optgroup label="自宅・駅">
-                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
-                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
-                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
-                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
-                </optgroup>
-                <optgroup label="試合・練習会場">
-                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
-                </optgroup>
-                <option value="__free__">その他（自由入力）</option>
-              </select>
-            </div>
+          <div style="margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">出発地</div>
+            <div id="place-from-container"></div>
           </div>
-          <div id="from-free-wrap" style="display:none" class="row">
-            <div class="field"><input type="text" id="from-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
-          </div>
-          <div class="row">
-            <div class="field">
-              <div class="label">到着地</div>
-              <select id="sel-to" onchange="onToChange()">
-                <option value="">— 選択 —</option>
-                <optgroup label="自宅・駅">
-                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
-                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
-                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
-                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
-                </optgroup>
-                <optgroup label="試合・練習会場">
-                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
-                </optgroup>
-                <option value="__free__">その他（自由入力）</option>
-              </select>
-            </div>
-          </div>
-          <div id="to-free-wrap" style="display:none" class="row">
-            <div class="field"><input type="text" id="to-free" placeholder="場所名または住所" oninput="updateMapsLink()"></div>
+          <div style="margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">到着地</div>
+            <div id="place-to-container"></div>
           </div>
           <div id="maps-area" style="display:none">
             <div class="maps-box">
@@ -317,67 +275,13 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
         <!-- 帰り（往復行き帰り別の時のみ表示） -->
         <div id="leg-return-wrap" style="display:none;border-top:2px dashed #e8e8e8;padding-top:12px;margin-top:8px">
           <div style="font-size:11px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">帰り</div>
-          <div class="row">
-            <div class="field">
-              <div class="label">出発地</div>
-              <select id="sel-from-r" onchange="onFromChangeR()">
-                <option value="">— 選択 —</option>
-                <optgroup label="自宅・駅">
-                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
-                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
-                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
-                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
-                </optgroup>
-                <optgroup label="試合・練習会場">
-                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
-                </optgroup>
-                <option value="__free__">その他（自由入力）</option>
-              </select>
-            </div>
+          <div style="margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">出発地</div>
+            <div id="place-from-r-container"></div>
           </div>
-          <div id="from-free-wrap-r" style="display:none" class="row">
-            <div class="field"><input type="text" id="from-free-r" placeholder="場所名または住所" oninput="updateMapsLinkR()"></div>
-          </div>
-          <div class="row">
-            <div class="field">
-              <div class="label">到着地</div>
-              <select id="sel-to-r" onchange="onToChangeR()">
-                <option value="">— 選択 —</option>
-                <optgroup label="自宅・駅">
-                  <option value="髙井家" data-addr="沖縄県那覇市おもろまち２丁目６−１５">髙井家</option>
-                  <option value="宮城家" data-addr="沖縄県那覇市上之屋１丁目１８−２２">宮城家</option>
-                  <option value="新垣家" data-addr="沖縄県那覇市">新垣家</option>
-                  <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-                  <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>
-                </optgroup>
-                <optgroup label="試合・練習会場">
-                  <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-                  <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-                  <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-                  <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-                  <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-                  <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-                  <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-                  <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-                  <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-                  <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>
-                </optgroup>
-                <option value="__free__">その他（自由入力）</option>
-              </select>
-            </div>
-          </div>
-          <div id="to-free-wrap-r" style="display:none" class="row">
-            <div class="field"><input type="text" id="to-free-r" placeholder="場所名または住所" oninput="updateMapsLinkR()"></div>
+          <div style="margin-bottom:10px">
+            <div class="label" style="margin-bottom:6px">到着地</div>
+            <div id="place-to-r-container"></div>
           </div>
           <div id="maps-area-r" style="display:none">
             <div class="maps-box">
@@ -649,7 +553,198 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const ADMIN_EMAIL = 'a.takai710@gmail.com';
 
-const LS = 'sougei_v1';
+const MONORAIL_STATIONS = [
+  { name: '那覇空港駅', addr: '沖縄県那覇市字鏡水150' },
+  { name: '赤嶺駅', addr: '沖縄県那覇市赤嶺1丁目' },
+  { name: '小禄駅', addr: '沖縄県那覇市小禄1丁目' },
+  { name: '奥武山公園駅', addr: '沖縄県那覇市奥武山町' },
+  { name: '壺川駅', addr: '沖縄県那覇市壺川3丁目' },
+  { name: '旭橋駅', addr: '沖縄県那覇市泉崎1丁目' },
+  { name: '県庁前駅', addr: '沖縄県那覇市久茂地3丁目' },
+  { name: '美栄橋駅', addr: '沖縄県那覇市牧志1丁目' },
+  { name: 'マキシ駅', addr: '沖縄県那覇市牧志3丁目' },
+  { name: '安里駅', addr: '沖縄県那覇市安里1丁目' },
+  { name: 'おもろまち駅', addr: '沖縄県那覇市おもろまち4丁目1' },
+  { name: '古島駅', addr: '沖縄県那覇市古島1丁目' },
+  { name: '市立病院前駅', addr: '沖縄県那覇市古島2丁目' },
+  { name: '儀保駅', addr: '沖縄県那覇市儀保1丁目' },
+  { name: '首里駅', addr: '沖縄県那覇市首里金城町1丁目' },
+  { name: '石嶺駅', addr: '沖縄県那覇市首里石嶺町4丁目' },
+  { name: '経塚駅', addr: '沖縄県浦添市経塚' },
+  { name: 'てだこ浦西駅', addr: '沖縄県浦添市前田3丁目21' },
+];
+
+const AIRPORTS = [
+  { name: '那覇空港', addr: '沖縄県那覇市字鏡水150' },
+  { name: '沖縄北部空港（辺野古）', addr: '沖縄県名護市辺野古' },
+];
+
+const FIXED_VENUES = [
+  { name: '県総蹴球場', addr: '沖縄県沖縄市比屋根5丁目3−1' },
+  { name: '西原マリンパーク', addr: '沖縄県中頭郡西原町東崎17' },
+  { name: 'コザしんきんドーム', addr: '沖縄県沖縄市諸見里2丁目1−1' },
+  { name: '沖縄市多目的運動場', addr: '沖縄県沖縄市諸見里2丁目1−1' },
+  { name: '金武町陸上競技場', addr: '沖縄県国頭郡金武町字金武7758' },
+  { name: '金武町フットボールセンター', addr: '沖縄県国頭郡金武町字金武10988-1' },
+  { name: '西崎陸上競技場', addr: '沖縄県糸満市西崎町3-1' },
+  { name: '具志川ドーム', addr: '沖縄県うるま市字具志川2336' },
+  { name: '与那城陸上競技場', addr: '沖縄県うるま市与那城中央5' },
+  { name: '東風平サッカー場', addr: '沖縄県島尻郡八重瀬町字東風平1136-2' },
+];
+
+// カスタム場所ピッカー
+let pickerState = {}; // { pickerId: { value, label, groupOpen } }
+
+function buildPlacePicker(pickerId, members, venues) {
+  const familyAddresses = {};
+  members.forEach(m => {
+    if (m.address) {
+      const fname = m.family_name || m.display_name;
+      if (!familyAddresses[fname]) familyAddresses[fname] = m.address;
+    }
+  });
+
+  const groups = [];
+  if (Object.keys(familyAddresses).length > 0) {
+    groups.push({
+      label: '🏠 自宅',
+      items: Object.entries(familyAddresses).map(([name, addr]) => ({ name, addr }))
+    });
+  }
+  groups.push({
+    label: '🚝 モノレール駅',
+    items: MONORAIL_STATIONS
+  });
+  groups.push({
+    label: '✈️ 空港',
+    items: AIRPORTS
+  });
+  if (venues && venues.length > 0) {
+    groups.push({
+      label: '⭐ 登録済み会場',
+      items: venues.map(v => ({ name: v.name, addr: v.address || v.name }))
+    });
+  }
+  groups.push({
+    label: '⚽ 固定会場',
+    items: FIXED_VENUES
+  });
+
+  if (!pickerState[pickerId]) pickerState[pickerId] = { value: '', label: '— 選択 —', openGroups: {} };
+
+  const current = pickerState[pickerId];
+  const groupsHtml = groups.map((g, gi) => {
+    const isOpen = current.openGroups[gi];
+    return `<div>
+      <div class="place-group-header" onclick="togglePlaceGroup('${pickerId}',${gi})">
+        <span>${g.label}（${g.items.length}）</span>
+        <span>${isOpen ? '▴' : '▾'}</span>
+      </div>
+      <div class="place-group-items ${isOpen ? 'open' : ''}" id="${pickerId}-group-${gi}">
+        ${g.items.map(item => `<div class="place-item ${current.value === item.name ? 'active' : ''}" onclick="selectPlace('${pickerId}','${item.name.replace(/'/g,"\\'")}','${item.addr.replace(/'/g,"\\'")}')">
+          ${item.name}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="place-picker" id="${pickerId}-picker">
+    <button type="button" class="place-picker-btn ${current.value ? 'selected' : ''}" onclick="togglePlacePicker('${pickerId}')">
+      <span>${current.label}</span>
+      <span style="color:#aaa;font-size:11px">▾</span>
+    </button>
+    <div class="place-picker-dropdown" id="${pickerId}-dropdown">
+      <div class="place-item" onclick="selectPlace('${pickerId}','','')">— 選択 —</div>
+      ${groupsHtml}
+      <div class="place-group-header" onclick="togglePlaceGroup('${pickerId}','free')" style="border-top:1px solid #f0f0f0">
+        <span>📝 その他（自由入力）</span>
+      </div>
+      <div class="place-group-items ${current.openGroups['free'] ? 'open' : ''}" id="${pickerId}-group-free" style="padding:8px 12px">
+        <input type="text" id="${pickerId}-free-input" placeholder="場所名または住所" style="margin-bottom:6px" oninput="onFreeInput('${pickerId}')">
+        <button class="small" onclick="confirmFreeInput('${pickerId}')" style="width:100%">この場所を選択</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function togglePlacePicker(pickerId) {
+  const dd = document.getElementById(pickerId + '-dropdown');
+  const isOpen = dd.classList.contains('open');
+  // 全部閉じる
+  document.querySelectorAll('.place-picker-dropdown.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) dd.classList.add('open');
+}
+
+function togglePlaceGroup(pickerId, groupIndex) {
+  if (!pickerState[pickerId]) pickerState[pickerId] = { value: '', label: '— 選択 —', openGroups: {} };
+  pickerState[pickerId].openGroups[groupIndex] = !pickerState[pickerId].openGroups[groupIndex];
+  const el = document.getElementById(`${pickerId}-group-${groupIndex}`);
+  if (el) el.classList.toggle('open');
+  // ヘッダーの▾▴を更新
+  const headers = document.querySelectorAll(`#${pickerId}-dropdown .place-group-header`);
+  // 簡単に再描画せず、テキストで更新
+}
+
+function selectPlace(pickerId, name, addr) {
+  if (!pickerState[pickerId]) pickerState[pickerId] = { value: '', label: '— 選択 —', openGroups: {} };
+  pickerState[pickerId].value = name;
+  pickerState[pickerId].addr = addr;
+  pickerState[pickerId].label = name || '— 選択 —';
+  // ボタン更新
+  const btn = document.querySelector(`#${pickerId}-picker .place-picker-btn`);
+  if (btn) {
+    btn.querySelector('span').textContent = pickerState[pickerId].label;
+    btn.className = `place-picker-btn ${name ? 'selected' : ''}`;
+  }
+  // ドロップダウン閉じる
+  const dd = document.getElementById(pickerId + '-dropdown');
+  if (dd) dd.classList.remove('open');
+  // Maps更新
+  updateMapsLinkFromPicker();
+}
+
+function onFreeInput(pickerId) {}
+
+function confirmFreeInput(pickerId) {
+  const input = document.getElementById(pickerId + '-free-input');
+  if (!input || !input.value.trim()) return;
+  selectPlace(pickerId, input.value.trim(), input.value.trim());
+}
+
+function getPickerValue(pickerId) {
+  return pickerState[pickerId]?.value || '';
+}
+function getPickerAddr(pickerId) {
+  return pickerState[pickerId]?.addr || pickerState[pickerId]?.value || '';
+}
+
+function updateMapsLinkFromPicker() {
+  const fa = getPickerAddr('place-from') || getPickerAddr('place-from-r');
+  const ta = getPickerAddr('place-to') || getPickerAddr('place-to-r');
+  // 行き
+  const fromA = getPickerAddr('place-from');
+  const toA = getPickerAddr('place-to');
+  const area = document.getElementById('maps-area');
+  if (fromA && toA && area) {
+    document.getElementById('maps-link').href = 'https://www.google.com/maps/dir/' + encodeURIComponent(fromA) + '/' + encodeURIComponent(toA) + '/?hl=ja&dirflg=d';
+    area.style.display = 'block';
+  } else if (area) { area.style.display = 'none'; }
+  // 帰り
+  const fromAR = getPickerAddr('place-from-r');
+  const toAR = getPickerAddr('place-to-r');
+  const areaR = document.getElementById('maps-area-r');
+  if (fromAR && toAR && areaR) {
+    document.getElementById('maps-link-r').href = 'https://www.google.com/maps/dir/' + encodeURIComponent(fromAR) + '/' + encodeURIComponent(toAR) + '/?hl=ja&dirflg=d';
+    areaR.style.display = 'block';
+  } else if (areaR) { areaR.style.display = 'none'; }
+}
+
+// ピッカーを外クリックで閉じる
+document.addEventListener('click', e => {
+  if (!e.target.closest('.place-picker')) {
+    document.querySelectorAll('.place-picker-dropdown.open').forEach(el => el.classList.remove('open'));
+  }
+});
 let currentUser = null;
 let currentPair = null;
 let myMember = null;
@@ -1023,51 +1118,13 @@ async function deleteVenue(id, name) {
 async function refreshPlaceSelects() {
   const members = await loadMembers();
   const { data: venues } = await sb.from('venues').select('*').eq('pair_id', currentPair.id).order('name');
+  const vList = venues || [];
 
-  // 自宅オプション（family_name単位で重複排除）
-  const familyAddresses = {};
-  members.forEach(m => {
-    if (m.address) {
-      const fname = m.family_name || m.display_name;
-      if (!familyAddresses[fname]) familyAddresses[fname] = m.address;
+  ['place-from', 'place-to', 'place-from-r', 'place-to-r'].forEach(id => {
+    const container = document.getElementById(id + '-container');
+    if (container) {
+      container.innerHTML = buildPlacePicker(id, members, vList);
     }
-  });
-  const homeOptions = Object.entries(familyAddresses)
-    .map(([fname, addr]) => `<option value="${fname}" data-addr="${addr}">${fname}</option>`)
-    .join('');
-
-  // 会場オプション
-  const venueOptions = venues ? venues
-    .map(v => `<option value="${v.name}" data-addr="${v.address || v.name}">${v.name}</option>`)
-    .join('') : '';
-
-  const fixedHomeOptions = `
-    <option value="おもろまち駅" data-addr="沖縄県那覇市おもろまち４丁目１">おもろまち駅</option>
-    <option value="てだこ浦西駅" data-addr="沖縄県浦添市前田３丁目２１">てだこ浦西駅</option>`;
-
-  const fixedVenueOptions = `
-    <option value="県総蹴球場" data-addr="沖縄県沖縄市比屋根５丁目３−１">県総蹴球場</option>
-    <option value="西原マリンパーク" data-addr="沖縄県中頭郡西原町東崎17">西原マリンパーク</option>
-    <option value="コザしんきんドーム" data-addr="沖縄県沖縄市諸見里２丁目１−１">コザしんきんドーム</option>
-    <option value="沖縄市多目的運動場" data-addr="沖縄県沖縄市諸見里２丁目１−１">沖縄市多目的運動場</option>
-    <option value="金武町陸上競技場" data-addr="沖縄県国頭郡金武町字金武7758">金武町陸上競技場</option>
-    <option value="金武町フットボールセンター" data-addr="沖縄県国頭郡金武町字金武10988-1">金武町フットボールセンター</option>
-    <option value="西崎陸上競技場" data-addr="沖縄県糸満市西崎町3-1">西崎陸上競技場</option>
-    <option value="具志川ドーム" data-addr="沖縄県うるま市字具志川2336">具志川ドーム</option>
-    <option value="与那城陸上競技場" data-addr="沖縄県うるま市与那城中央5">与那城陸上競技場</option>
-    <option value="東風平サッカー場" data-addr="沖縄県島尻郡八重瀬町字東風平1136-2">東風平サッカー場</option>`;
-
-  const fullOptions = `
-    <option value="">— 選択 —</option>
-    ${homeOptions ? `<optgroup label="自宅">${homeOptions}</optgroup>` : ''}
-    <optgroup label="駅">${fixedHomeOptions}</optgroup>
-    ${venueOptions ? `<optgroup label="登録済み会場">${venueOptions}</optgroup>` : ''}
-    <optgroup label="固定会場">${fixedVenueOptions}</optgroup>
-    <option value="__free__">その他（自由入力）</option>`;
-
-  ['sel-from','sel-to','sel-from-r','sel-to-r'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = fullOptions;
   });
 }
 
@@ -1208,8 +1265,8 @@ async function addEntry() {
   const toll = parseFloat(document.getElementById('inp-toll').value) || 0;
   const other = parseFloat(document.getElementById('inp-other').value) || 0;
   const note = document.getElementById('inp-note').value.trim();
-  const fromPlace = getSelectedName('sel-from', 'from-free');
-  const toPlace = getSelectedName('sel-to', 'to-free');
+  const fromPlace = getPickerValue('place-from');
+  const toPlace = getPickerValue('place-to');
 
   const btn = document.querySelector('#tab-log button.primary');
   btn.textContent = '保存中...'; btn.disabled = true;
@@ -1235,8 +1292,8 @@ async function addEntry() {
     const tollR = parseFloat(document.getElementById('inp-toll-r').value) || 0;
     const otherR = parseFloat(document.getElementById('inp-other-r').value) || 0;
     const noteR = document.getElementById('inp-note-r').value.trim();
-    const fromPlaceR = getSelectedName('sel-from-r', 'from-free-r');
-    const toPlaceR = getSelectedName('sel-to-r', 'to-free-r');
+    const fromPlaceR = getPickerValue('place-from-r');
+    const toPlaceR = getPickerValue('place-to-r');
     entries.push({
       pair_id: currentPair.id, user_id: currentUser.id,
       driver_id: driverId, passengers: passengerIds,
@@ -1270,12 +1327,13 @@ async function addEntry() {
     ['inp-km','inp-toll','inp-other','inp-note','inp-km-r','inp-toll-r','inp-other-r','inp-note-r'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
-    ['sel-from','sel-to','sel-from-r','sel-to-r'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
+    // ピッカーリセット
+    ['place-from','place-to','place-from-r','place-to-r'].forEach(id => {
+      pickerState[id] = { value: '', label: '— 選択 —', openGroups: {} };
     });
-    ['from-free-wrap','to-free-wrap','from-free-wrap-r','to-free-wrap-r','maps-area','maps-area-r'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.style.display = 'none';
-    });
+    refreshPlaceSelects();
+    document.getElementById('maps-area').style.display = 'none';
+    const arR = document.getElementById('maps-area-r'); if (arR) arR.style.display = 'none';
     document.querySelectorAll('input[name="passenger"], input[name="passenger-r"]').forEach(cb => cb.checked = false);
     updatePreview();
     showToast(mode === 'diff' ? '行き・帰り両方記録しました！' : '記録しました！');
