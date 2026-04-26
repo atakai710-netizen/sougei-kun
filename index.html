@@ -122,12 +122,8 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
 
     <div style="margin-bottom:20px">
       <div class="sec-title">新しいグループを作る</div>
-      <div class="label">あなたの家族名</div>
-      <select id="pair-family" style="margin-bottom:10px">
-        <option value="髙井家">髙井家</option>
-        <option value="宮城家">宮城家</option>
-        <option value="新垣家">新垣家</option>
-      </select>
+      <div class="label">あなたの家族名（例：比嘉家）</div>
+      <input type="text" id="pair-family" placeholder="例：比嘉家" style="margin-bottom:10px">
       <div class="label">表示名（例：髙井家パパ）</div>
       <input type="text" id="pair-myname" placeholder="あなたの表示名" style="margin-bottom:10px">
       <div class="label">グループ名（例：さくらチーム送迎）</div>
@@ -143,13 +139,9 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
 
     <div>
       <div class="sec-title">招待コードで参加する</div>
-      <div class="label">あなたの家族名</div>
-      <select id="join-family" style="margin-bottom:10px">
-        <option value="髙井家">髙井家</option>
-        <option value="宮城家">宮城家</option>
-        <option value="新垣家">新垣家</option>
-      </select>
-      <div class="label">表示名（例：宮城家パパ）</div>
+      <div class="label">あなたの家族名（例：比嘉家）</div>
+      <input type="text" id="join-family" placeholder="例：比嘉家" style="margin-bottom:10px">
+      <div class="label">表示名（例：比嘉家パパ）</div>
       <input type="text" id="join-myname" placeholder="あなたの表示名" style="margin-bottom:10px">
       <div class="label">招待コード（6桁）</div>
       <input type="text" id="join-code" placeholder="123456" maxlength="6" style="margin-bottom:10px;text-align:center;font-size:20px;font-weight:700;letter-spacing:4px">
@@ -860,7 +852,8 @@ function generateCode() {
 async function createPair() {
   const myname = document.getElementById('pair-myname').value.trim();
   const pairname = document.getElementById('pair-name').value.trim();
-  const familyName = document.getElementById('pair-family').value;
+  const familyName = document.getElementById('pair-family').value.trim();
+  if (!familyName) { showToast('家族名を入力してください'); return; }
   if (!myname || !pairname) { showToast('表示名とグループ名を入力してください'); return; }
 
   const code = generateCode();
@@ -888,7 +881,8 @@ async function createPair() {
 async function joinPair() {
   const myname = document.getElementById('join-myname').value.trim();
   const code = document.getElementById('join-code').value.trim();
-  const familyName = document.getElementById('join-family').value;
+  const familyName = document.getElementById('join-family').value.trim();
+  if (!familyName) { showToast('家族名を入力してください'); return; }
   if (!myname || !code) { showToast('表示名と招待コードを入力してください'); return; }
 
   const { data: pairs, error: pe } = await sb.from('pairs').select('*').eq('invite_code', code);
