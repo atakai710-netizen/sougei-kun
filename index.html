@@ -302,7 +302,7 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
           </div>
           <div class="row">
             <div class="field"><div class="label">その他 (円)</div><input type="number" id="inp-other-r" placeholder="0" min="0" oninput="updatePreview()"></div>
-            <div class="field"><div class="label">メモ</div><input type="text" id="inp-note-r" placeholder="例：帰りは新垣家も"></div>
+            <div class="field"><div class="label">メモ</div><input type="text" id="inp-note-r" placeholder="例：帰りは○○家も"></div>
           </div>
         </div>
 
@@ -354,15 +354,15 @@ button.danger-sm{height:28px;background:#fff;color:#d32f2f;border:1px solid #ffc
       <div class="card">
         <div class="sec-title">自分の情報</div>
         <div class="label" style="margin-bottom:4px">表示名</div>
-        <input type="text" id="new-display-name" placeholder="例：髙井家パパ" style="margin-bottom:10px">
+        <input type="text" id="new-display-name" placeholder="例：山田家パパ" style="margin-bottom:10px">
         <div class="label" style="margin-bottom:4px">自宅住所（プルダウンに表示されます）</div>
-        <input type="text" id="new-address" placeholder="例：沖縄県那覇市おもろまち2-6-15" style="margin-bottom:10px">
+        <input type="text" id="new-address" placeholder="例：沖縄県○○市○○町1-2-3" style="margin-bottom:10px">
         <button class="secondary" onclick="updateProfile()" style="width:100%">保存する</button>
       </div>
       <div class="card" id="group-admin-card" style="display:none">
         <div class="sec-title">グループ管理</div>
         <div class="label" style="margin-bottom:4px">グループ名</div>
-        <input type="text" id="new-pair-name" placeholder="例：さくらチーム送迎" style="margin-bottom:10px">
+        <input type="text" id="new-pair-name" placeholder="例：○○チーム送迎" style="margin-bottom:10px">
         <button class="secondary" onclick="updatePairName()" style="width:100%;margin-bottom:16px">グループ名を変更</button>
         <div class="sec-title" style="margin-bottom:8px">会場を追加</div>
         <div class="label" style="margin-bottom:4px">会場名</div>
